@@ -16,6 +16,7 @@ from PIL import Image
 #-----------------------------------------------
 import socket
 import pickle
+import random
 from protocol import Message
 
 def main():
@@ -30,7 +31,7 @@ def main():
         s.connect((host_ip, port))
 
         #Client data message to be sent to server
-        msg = Message(who = Message.PI, host_ip=socket.gethostbyname(socket.gethostname()), port=5001)
+        msg = Message(who = Message.PI, host_ip=socket.gethostbyname(socket.gethostname()), port=random.randint(0,5009))
         #print(msg.who + msg.host_ip, msg.port)
         print(msg)
         #Pickle Message and send it to sever

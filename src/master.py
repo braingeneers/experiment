@@ -21,34 +21,53 @@ from protocol import Message
 
 def main():
 
-	print("Arg1:" + sys.argv[1])
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #create socket
+    #array containing avaliable Rasperry Pi units
+    rasPi = []
 
-#	host = socket.gethostname()
-	port = int(sys.argv[1])
-	s.bind(('', port)) #bind to port
-	print("socket binded to " + str(port))
+    print("Arg1:" + sys.argv[1])
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #create socket
+
+    #host = socket.gethostname()
+    port = int(sys.argv[1])
+    s.bind(('', port)) #bind to port
+    print("socket binded to " + str(port))
 
 	# listen on socket
-	s.listen(5)
-	while True:
+    s.listen(5)
+    while True:
+        # Establish connection with client
+        c, addr = s.accept()
+        print ("Got connection from " + str(addr))
 
-	       # Establish connection with client
-           c, addr = s.accept()
-           print ("Got connection from " + str(addr))
+        # receive 8 bit number from client
+        data_string = c.recv(2048)
+        msg = pickle.loads(data_string)
 
-	       # receive 8 bit number from client
-           data_string = c.recv(1024)
-           msg = pickle.loads(data_string)
+        if (msg.who == Message.PI):
+            rasPi.append(msg)
+            print("Pis Recorded: ", len(rasPi))
+            for pi in rasPi:
+                print(pi)
+        elif (msg.who == Message.CLIENT):
+            allocatedPi = rasPi[0]
+            data_string = pickle.dumps(allocatedPi)
+            c.send(data_string)
+            rasPi.pop(0)
+            print("Pis Recorded: ", len(rasPi))
+            for pi in rasPi:
+                print(pi)
 
-           print("Master sent: ")
-           #print(msg.who, msg.host_ip, msg.port)
-           print(msg)
-           c.send(data_string)
+
+
+        print("Master sent: ")
+        #print(msg.who, msg.host_ip, msg.port)
+        print(msg)
+        c.send(data_string)
 
 	#-----------------------------------------------
-	c.close() #close connection with client
-	s.close() #close socket
+    c.close() #close connection with client
+    s.close() #close socket
 	#-----------------------------------------------
 
 

@@ -32,7 +32,7 @@ def main():
 	s.send(data_string)
 
 
-	out = s.recv(1024) # receive echo from client
+	out = s.recv(2048) # receive echo from client
 	msg = pickle.loads(out)
 	print("Recieved: ", str(msg))
 	time.sleep(1)

@@ -3,6 +3,7 @@
 class Message:
     CLIENT = 0
     PI = 1
+    
 
     def __init__(self, who, host_ip, port):
     	self.who = who #client
