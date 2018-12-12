@@ -24,7 +24,7 @@ def main():
 	s.connect((host_ip, port))
 
 	#Client data message to be sent to server
-	msg = Message()
+	msg = Message(who = Message.CLIENT, host_ip=socket.gethostbyname(socket.gethostname()), port=5001)
 	#print(msg.who + msg.host_ip, msg.port)
 	print(msg)
 	#Pickle Message and send it to sever
