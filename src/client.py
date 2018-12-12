@@ -1,0 +1,47 @@
+#!/usr/bin/python
+import sys
+import socket
+import pickle
+#import numpy as np
+import random
+import time
+#import protocol #defines internal Messaging format
+
+#usage: python3 client.py host port
+#example: python3 client.py localhost 5001
+
+
+from protocol import Message
+
+def main():
+	print(("Arg1: %s Arg2: %s" % (sys.argv[1], sys.argv[2])))
+
+	s = socket.socket() #create socket
+	port = int(sys.argv[2]) #bind to port
+
+	# connect to server
+	host_ip = socket.gethostbyname(str(sys.argv[1]))
+	s.connect((host_ip, port))
+
+	#Client data message to be sent to server
+	msg = Message()
+	#print(msg.who + msg.host_ip, msg.port)
+	print(msg)
+	#Pickle Message and send it to sever
+	data_string = pickle.dumps(msg)
+	s.send(data_string)
+
+
+	out = s.recv(1024) # receive echo from client
+	msg = pickle.loads(out)
+	print("Recieved: ", str(msg))
+	time.sleep(1)
+
+
+	#-----------------------------------------------
+	s.close() #close socket
+	#-----------------------------------------------
+
+
+if __name__ == '__main__':
+	  main()
