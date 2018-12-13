@@ -22,25 +22,22 @@ from protocol import Message
 def main():
 
         print(("Arg1: %s Arg2: %s" % (sys.argv[1], sys.argv[2])))
+        msg = Message.announce(sys.argv[2], sys.argv[1], socket.gethostname(), Message.PI, random.randint(0,5009))
 
+#=====================Communicate with Client==========================
+"""        print("Connecting to Client..")
         s = socket.socket() #create socket
-        port = int(sys.argv[2]) #bind to port
+        port = int(msg.port) #bind to port
 
         # connect to server
-        host_ip = socket.gethostbyname(str(sys.argv[1]))
-        s.connect((host_ip, port))
+        s.connect((msg.host_ip, port))
 
         #Client data message to be sent to server
-        msg = Message(who = Message.PI, host_ip=socket.gethostbyname(socket.gethostname()), port=random.randint(0,5009))
-        #print(msg.who + msg.host_ip, msg.port)
-        print(msg)
-        #Pickle Message and send it to sever
-        data_string = pickle.dumps(msg)
         s.send(data_string)
 
 
         out = s.recv(1024) # receive echo from client
-        msg = pickle.loads(out)
+
         print("Recieved: ", str(msg))
         time.sleep(1)
 
@@ -48,8 +45,7 @@ def main():
         #-----------------------------------------------
         s.close() #close socket
         #-----------------------------------------------
-
-
+"""
 
 if __name__ == '__main__':
 	  main()

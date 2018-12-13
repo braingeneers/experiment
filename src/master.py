@@ -21,8 +21,9 @@ from protocol import Message
 
 def main():
 
-    #array containing avaliable Rasperry Pi units
-    rasPi = []
+    #arrays tracking Rasperry Pi units
+    readyPi = []
+    busyPi = []
 
     print("Arg1:" + sys.argv[1])
 
@@ -45,24 +46,24 @@ def main():
         msg = pickle.loads(data_string)
 
         if (msg.who == Message.PI):
-            rasPi.append(msg)
-            print("Pis Recorded: ", len(rasPi))
-            for pi in rasPi:
+            readyPi.append(msg)
+            print("Pis Recorded: ", len(readyPi))
+            for pi in readyPi:
                 print(pi)
         elif (msg.who == Message.CLIENT):
-            allocatedPi = rasPi[0]
+            allocatedPi = readyPi[0]
+            busyPi.append(allocatedPi)
             data_string = pickle.dumps(allocatedPi)
             c.send(data_string)
-            rasPi.pop(0)
-            print("Pis Recorded: ", len(rasPi))
-            for pi in rasPi:
+            readyPi.pop(0)
+            print("Pis Recorded: ", len(readyPi))
+            for pi in readyPi:
                 print(pi)
 
 
 
-        print("Master sent: ")
-        #print(msg.who, msg.host_ip, msg.port)
-        print(msg)
+        print("Master sent: ", str(msg))
+    
         c.send(data_string)
 
 	#-----------------------------------------------
