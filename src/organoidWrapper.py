@@ -25,27 +25,9 @@ def main():
         msg = Message.announce(sys.argv[2], sys.argv[1], socket.gethostname(), Message.PI, random.randint(0,5009))
 
 #=====================Communicate with Client==========================
-"""        print("Connecting to Client..")
-        s = socket.socket() #create socket
-        port = int(msg.port) #bind to port
-
-        # connect to server
-        s.connect((msg.host_ip, port))
-
-        #Client data message to be sent to server
-        s.send(data_string)
+#Listen for Client
 
 
-        out = s.recv(1024) # receive echo from client
-
-        print("Recieved: ", str(msg))
-        time.sleep(1)
-
-
-        #-----------------------------------------------
-        s.close() #close socket
-        #-----------------------------------------------
-"""
 
 if __name__ == '__main__':
 	  main()
