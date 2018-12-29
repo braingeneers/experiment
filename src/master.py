@@ -26,55 +26,75 @@ class Master:
         print("socket binded to " + str(self.port))
 
     def printPis(self):
-        print("Pis Ready: ", len(readyPi))
-        for pi in readyPi:
+        print("Pis Ready: ", len(Master.readyPi))
+        for pi in Master.readyPi:
             print(pi)
-        print("Pis Busy:", len(busyPi))
-        for pi in busyPi:
+        print("Pis Busy:", len(Master.busyPi))
+        for pi in Master.busyPi:
             print(pi)
+
 
 
     def controlFlow(self):
         # listen on socket
-        s = self.s
-        readyPi = Master.readyPi
-        busyPi = Master.busyPi
-        s.listen(5)
+        self.s.listen(5)
+
         while True:
             # Establish connection with client
-            c, addr = s.accept()
+            c, addr = self.s.accept()
             print ("Got connection from " + str(addr))
 
-            # receive 8 bit number from client
+            # receive message from client
             data_string = c.recv(2048)
             msg = pickle.loads(data_string)
 
             if (msg.who == Message.PI):
-                readyPi.append(msg)
-                replymsg = copy.deepcopy(msg)
-                replymsg.who = Message.MASTER
-                replymsg.success = True
-                msg.success = True
-                self.printPis()
-                data_string = pickle.dumps(replymsg)
-                print("Master sent: ", str(replymsg))
-                c.send(data_string)
+                self.servicePi(msg, c)
+
             elif (msg.who == Message.CLIENT):
-                allocatedPi = copy.deepcopy(readyPi[0])
-                busyPi.append(allocatedPi)
-                data_string = pickle.dumps(allocatedPi)
-                c.send(data_string)
-                readyPi.pop(0)
-                print("Pis Recorded: ", len(readyPi))
-                for pi in readyPi:
-                    print(pi)
-
-
+                self.serviceClient(msg, c)
 
     	#-----------------------------------------------
         c.close() #close connection with client
         s.close() #close socket
     	#-----------------------------------------------
+
+    def servicePi(self, msg, c):
+        Master.readyPi.append(msg) #start tracking this Pi
+        msg.success = True
+
+        self.printPis() #show all Pis
+
+        #reply to Pi
+        replymsg = copy.deepcopy(msg)
+        self.reply(replymsg, c, True)
+
+
+    def serviceClient(self, msg,c):
+        #reply to Client
+        if not Master.readyPi:
+            self.reply(msg, c, False)
+        else:
+            allocatedPi = copy.deepcopy(Master.readyPi[0])
+            self.reply(allocatedPi, c, True)
+            #update Pi tracking
+            Master.busyPi.append(allocatedPi)
+            Master.readyPi.pop(0)
+
+            self.printPis()
+
+    def reply(self, replymsg, c, success):
+        replymsg.who = Message.MASTER
+        replymsg.success = success
+
+        data_string = pickle.dumps(replymsg)
+        print("Master sent: ", str(replymsg))
+        c.send(data_string)
+
+
+
+
+
 
 
 

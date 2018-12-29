@@ -18,6 +18,7 @@ import socket
 import pickle
 import random
 from protocol import Message
+#Usage: python3 organoidWrapper.py host port
 
 def main():
 
