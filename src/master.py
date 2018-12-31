@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#usage python3 organoid.py 5001
+#usage python3 master.py 5001
 
 import numpy as np
 #import matplotlib.pyplot as plt
