@@ -3,6 +3,12 @@ Software infrastructure for allocating and executing organoid experiments
 
 ### Usage
 In cloned directory:  
-On Raspberry Pi: ```./RasPiStart.sh ```  
-On Master Server: ```./MasterStart.sh ```  
-On Client: ```./ClientStart.sh ```  
+  
+On Raspberry Pi:  
+```./src/RasPiStart.sh ```  
+
+On Master Server:  
+```./src/MasterStart.sh ```  
+
+On Client:  
+```./src/ClientStart.sh ```  
