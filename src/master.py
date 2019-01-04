@@ -71,6 +71,11 @@ class Master:
         replymsg = copy.deepcopy(msg)
         self.reply(replymsg, c, True)
 
+    #maintain sewuence numbers in meesages when communicating to pi
+    #def experiment(self):
+    #    seq_num = 0
+    #    pattern = 0
+
 
     def serviceClient(self, msg,c):
         #reply to Client

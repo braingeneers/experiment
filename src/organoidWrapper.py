@@ -18,6 +18,7 @@ import socket
 import pickle
 import random
 from protocol import Message
+import organoid #from organoid import OrganoidSim
 #Usage: python3 organoidWrapper.py host port
 
 class RasPi:
@@ -83,8 +84,42 @@ def main():
 
         #========================Experiment==========================
         while(True):
-            time.sleep(3500) #5min
+            #time.sleep(3500) #5min
             #Pi.checkIP()
+
+        	seq_num = 0 #feedback loop sequence number
+
+        	#Iniialize Organoid
+        	sim = OrganoidSim(n=None, u=None, num_inputs=8, cam=None)
+
+        	# listen on socket
+        	s.listen(5)
+        	while True:
+
+        	# Establish connection with client
+        		c, addr = s.accept()
+        		print ("Got connection from " + str(addr))
+
+        		while True:
+        			# receive 8 bit number from client
+        			input = c.recv(128)
+        			print("Master sent: ")
+        			print(str(input))
+        			# echo 8 bit number
+        			c.send(input)
+
+        			#Organoid Simulation
+        			pattern = int(input)
+        			i = seq_num
+        			sim.make_rob_a_picture('figures/', seq_num, 1000, 1100, pattern)
+        			sim.plot_stim('figures/', seq_num, pattern=pattern, num_inputs=sim.u_width())
+
+        			seq_num+=1 #increment sequence number
+
+        	#-----------------------------------------------
+        	c.close() #close connection with client
+        	s.close() #close socket
+        	#-----------------------------------------------
 
 
 
