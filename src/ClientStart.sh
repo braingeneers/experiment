@@ -2,7 +2,7 @@
 #Client Configuration
 
 PORT='5003'
-MASTER_IP='localhost'
+MASTER_HOSTNAME='localhost'
 
 #start program
-python3 client.py $MASTER_IP $PORT
+python3 client.py $MASTER_HOSTNAME $PORT

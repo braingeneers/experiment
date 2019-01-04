@@ -56,18 +56,25 @@ class Master:
 
     	#-----------------------------------------------
         c.close() #close connection with client
-        s.close() #close socket
     	#-----------------------------------------------
 
     def servicePi(self, msg, c):
-        Master.readyPi.append(msg) #start tracking this Pi
         msg.success = True
+        if (msg.id == None):
+            print("# Ready pi:", len(Master.readyPi), "# Busy pi:",  len(Master.busyPi))
+            msg.id = len(Master.readyPi) + len(Master.busyPi) + 1
+        Master.readyPi.append(msg) #start tracking this Pi
 
         self.printPis() #show all Pis
 
         #reply to Pi
         replymsg = copy.deepcopy(msg)
         self.reply(replymsg, c, True)
+
+    #maintain sewuence numbers in meesages when communicating to pi
+    #def experiment(self):
+    #    seq_num = 0
+    #    pattern = 0
 
 
     def serviceClient(self, msg,c):
@@ -91,6 +98,8 @@ class Master:
         print("Master sent: ", str(replymsg))
         c.send(data_string)
 
+    def closeService(self):
+        s.close() #close socket
 
 
 
