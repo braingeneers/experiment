@@ -13,4 +13,4 @@ On Master Server:
 On Client:  
 ```./src/ClientStart.sh ```  
 
-*Master must be running before Client or Pi programs run and try to connect*
+*Master must be running before Client or Pi programs are up*
