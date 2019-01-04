@@ -56,12 +56,14 @@ class Master:
 
     	#-----------------------------------------------
         c.close() #close connection with client
-        s.close() #close socket
     	#-----------------------------------------------
 
     def servicePi(self, msg, c):
-        Master.readyPi.append(msg) #start tracking this Pi
         msg.success = True
+        if (msg.id == None):
+            print("# Ready pi:", len(Master.readyPi), "# Busy pi:",  len(Master.busyPi))
+            msg.id = len(Master.readyPi) + len(Master.busyPi) + 1
+        Master.readyPi.append(msg) #start tracking this Pi
 
         self.printPis() #show all Pis
 
@@ -91,6 +93,8 @@ class Master:
         print("Master sent: ", str(replymsg))
         c.send(data_string)
 
+    def closeService(self):
+        s.close() #close socket
 
 
 
