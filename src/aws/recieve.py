@@ -12,3 +12,6 @@ for k in experiment["payload"]:
     print(k["value"], k["hold"])
 
 print(experiment)
+
+if (experiment["type"] == "simulated"):
+    print("True!!")

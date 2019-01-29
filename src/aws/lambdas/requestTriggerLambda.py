@@ -10,19 +10,13 @@ sqs = boto3.client('sqs')
 email_from = 'kvoitiuk@ucsc.edu'
 #email_cc = ''
 emaiL_subject = 'AWS: File Uploaded to S3'
-bucket = 'braingeneers'
-key = 'results/'
+
 
 def lambda_handler(event, context):
 
-    #parse sqs event on requestCompleteQueue
-    #deeplearning
-    guid = event['Records'][0]['body']
-
-    key = 'results/' + guid + '.json'
-
-    link = 'https://s3-us-west-2.amazonaws.com/braingeneers/results/' + guid + '.json'
-    email_body = 'Results are ready for the following experiment:\n' + guid + '\n\nLink:\n' + link
+    # Get the object from the event and show its name (should be json by trigger)
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = event['Records'][0]['s3']['object']['key']
 
     # Get the data from file
     f = s3.get_object(Bucket=bucket, Key=key)
@@ -32,6 +26,25 @@ def lambda_handler(event, context):
     experiment = data["experiment"]
     email_to = experiment["email"]
 
+    #Distribute load------------------------------------
+    #find correct queue
+    if(experiment["type"] == "simulated"):
+        queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
+        queue_url = queues['QueueUrls'][0]
+    else:
+        queues = sqs.list_queues(QueueNamePrefix='realExperimentQueue') # we filter to narrow down the list
+        queue_url = queues['QueueUrls'][0]
+
+#    return ("URL: " + queue_url)
+
+    #enqueue request
+    enqueue_response = client.send_message(QueueUrl=queue_url, MessageBody=experiment[guid])
+#    return ('Message ID : ',enqueue_response['MessageId'])
+
+
+    #---------------------------------------------------
+
+    email_body = 'Success! Your experiment has been registered. \nExperiment GUID: ' + experiment[guid] #+ '\nOrganoid:' + o_guid
 
     response = ses.send_email(
         Source = email_from,
@@ -49,7 +62,7 @@ def lambda_handler(event, context):
             },
             'Body': {
                 'Text': {
-                    'Data': email_body
+                    'Data': email_body + bucket + '/'+ key + '\n'
                 }
             }
         }
