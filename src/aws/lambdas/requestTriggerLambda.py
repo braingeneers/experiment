@@ -8,7 +8,6 @@ s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 
 email_from = 'kvoitiuk@ucsc.edu'
-#email_cc = ''
 emaiL_subject = 'AWS: File Uploaded to S3'
 
 
@@ -27,34 +26,38 @@ def lambda_handler(event, context):
     email_to = experiment["email"]
 
     #Distribute load------------------------------------
+
     #find correct queue
     if(experiment["type"] == "simulated"):
         queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
-        queue_url = queues['QueueUrls'][0]
     else:
         queues = sqs.list_queues(QueueNamePrefix='realExperimentQueue') # we filter to narrow down the list
-        queue_url = queues['QueueUrls'][0]
 
-#    return ("URL: " + queue_url)
+    queue_url = queues['QueueUrls'][0]
 
     #enqueue request
-    enqueue_response = client.send_message(QueueUrl=queue_url, MessageBody=experiment[guid])
-#    return ('Message ID : ',enqueue_response['MessageId'])
+    enqueue_response = sqs.send_message(QueueUrl=queue_url, MessageBody=experiment["guid"])
+
+    #----------------------------------------------------
+
+    #augment json with organoid guid
+    oguid = queue_url[queue_url.index("Queue")+len("Queue"):]
+    experiment["oguid"] = oguid
+    s3.put_object(Body=json.dumps(data), Bucket=bucket, Key='results/result.json')
 
 
-    #---------------------------------------------------
+    return
+    #email (optional)---------------------------------------------------
 
-    email_body = 'Success! Your experiment has been registered. \nExperiment GUID: ' + experiment[guid] #+ '\nOrganoid:' + o_guid
+    email_body = 'Success! Your experiment has been registered. \nExperiment GUID: ' + experiment["guid"] + '\nOrganoid:' + oguid
+
 
     response = ses.send_email(
         Source = email_from,
         Destination={
             'ToAddresses': [
                 email_to,
-            ],
-#          'CcAddresses': [
-#             email_cc,
-#            ]
+            ]
         },
         Message={
             'Subject': {
@@ -62,7 +65,7 @@ def lambda_handler(event, context):
             },
             'Body': {
                 'Text': {
-                    'Data': email_body + bucket + '/'+ key + '\n'
+                    'Data': email_body
                 }
             }
         }
