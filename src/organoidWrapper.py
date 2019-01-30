@@ -45,7 +45,6 @@ class RasPi:
         RasPi.server_hostname=master_hostname
 
 
-
     def checkIP(self):
         currentIP = socket.gethostbyname(socket.gethostname())
         if(currentIP != RasPi.my_ip_address):
@@ -81,44 +80,45 @@ def main():
         #msg = Pi.receiveMsg()
         #print("My ID is:", msg.id)
 
-
+        #load numpy with pattern stimulation
+        #y = np.load(f)
+        #print(y)
         #========================Experiment==========================
-        while(True):
-            #time.sleep(3500) #5min
-            #Pi.checkIP()
+        #time.sleep(3500) #5min
+        #Pi.checkIP()
 
-        	seq_num = 0 #feedback loop sequence number
+    	seq_num = 0 #feedback loop sequence number
 
-        	#Iniialize Organoid
-        	sim = OrganoidSim(n=None, u=None, num_inputs=8, cam=None)
+    	#Iniialize Organoid
+    	sim = OrganoidSim(n=None, u=None, num_inputs=8, cam=None)
 
-        	# listen on socket
-        	s.listen(5)
+    	# listen on socket
+    	s.listen(5)
+    	while True:
+
+    	    # Establish connection with client
+		    c, addr = s.accept()
+    		print ("Got connection from " + str(addr))
+
         	while True:
+        		# receive 8 bit number from client
+        		input = c.recv(128)
+        		print("Master sent: ")
+        		print(str(input))
+        		# echo 8 bit number
+        		c.send(input)
 
-        	# Establish connection with client
-        		c, addr = s.accept()
-        		print ("Got connection from " + str(addr))
+        		#Organoid Simulation
+        		pattern = int(input)
+        		i = seq_num
+        		sim.make_rob_a_picture('figures/', seq_num, 1000, 1100, pattern)
+        		sim.plot_stim('figures/', seq_num, pattern=pattern, num_inputs=sim.u_width())
 
-        		while True:
-        			# receive 8 bit number from client
-        			input = c.recv(128)
-        			print("Master sent: ")
-        			print(str(input))
-        			# echo 8 bit number
-        			c.send(input)
-
-        			#Organoid Simulation
-        			pattern = int(input)
-        			i = seq_num
-        			sim.make_rob_a_picture('figures/', seq_num, 1000, 1100, pattern)
-        			sim.plot_stim('figures/', seq_num, pattern=pattern, num_inputs=sim.u_width())
-
-        			seq_num+=1 #increment sequence number
+        		seq_num+=1 #increment sequence number
 
         	#-----------------------------------------------
-        	c.close() #close connection with client
-        	s.close() #close socket
+        c.close() #close connection with client
+        s.close() #close socket
         	#-----------------------------------------------
 
 

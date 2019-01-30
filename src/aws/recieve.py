@@ -15,3 +15,7 @@ print(experiment)
 
 if (experiment["type"] == "simulated"):
     print("True!!")
+
+	#filename = e_guid + ".json"
+	#with open(filename, "w") as write_file:
+	#		json.dump(data, write_file)
