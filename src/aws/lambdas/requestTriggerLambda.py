@@ -43,7 +43,7 @@ def lambda_handler(event, context):
     #augment json with organoid guid
     oguid = queue_url[queue_url.index("Queue")+len("Queue"):]
     experiment["oguid"] = oguid
-    s3.put_object(Body=json.dumps(data), Bucket=bucket, Key='results/result.json')
+    s3.put_object(Body=json.dumps(data), Bucket=bucket, Key="results/" + guid + ".json")
 
 
     return

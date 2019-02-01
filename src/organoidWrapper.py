@@ -16,6 +16,7 @@ import time
 
 import sys
 import os
+import os.path
 import PIL
 import boto3
 import json
@@ -85,6 +86,7 @@ def main():
             s3 = boto3.client('s3')
             bucket = 'katetemptestbucket'
 
+            #find virtualExperimentQueues
             queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
             queue_url = queues['QueueUrls'][0]
             print(queue_url)
@@ -100,10 +102,10 @@ def main():
                         print("Experiment guid:", guid)
 
                         #Get the experiment instructions json in s3
-
                         key_json = "experiments/" + guid + ".json"
                         f = s3.get_object(Bucket=bucket, Key=key_json)
                         data = json.load(f['Body'])
+
                         # Read json values
                         experiment = data["experiment"]
                         print(experiment)
@@ -123,6 +125,13 @@ def main():
                             print(inputArray)
                             configuredExperiment(inputArray, filepath)
 
+                            #upload results to s3
+                            path = os.getcwd() #get current working directory
+                            for root,dirs,files in os.walk(path+"/figures"):
+                                for file in files:
+                                    s3.upload_file(os.path.join(root,file), bucket, "results/" + guid + "/" + file)
+
+                            #Notify "Experiment Done" to AWS Lambda
                             done_queues = sqs.list_queues(QueueNamePrefix='requestCompleteQueue') # we filter to narrow down the list
                             done_queue_url = done_queues['QueueUrls'][0]
                             enqueue_response = sqs.send_message(QueueUrl=done_queue_url, MessageBody=guid)
