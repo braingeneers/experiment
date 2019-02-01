@@ -127,7 +127,7 @@ class OrganoidSim():
             cam.update(T, show=False)
         cam.update(T, show=True)
         #print(np.binary_repr(pattern, width=num_inputs))
-        plt.savefig(name + "img" + str(seq_num) +'.png') #+ '_' + str(np.binary_repr(pattern, width=num_inputs)) +'_'+'out'
+        plt.savefig(name + str(seq_num) + '_' + str(np.binary_repr(pattern, width=num_inputs)) +'_'+'out'+'.png')
 	#plt.close()
 
 
@@ -156,7 +156,7 @@ class OrganoidSim():
         y = np.delete(y, index)
         plt.plot(x,y, 'o', color='tab:orange')
         plt.savefig(name + str(seq_num) + '_' + str(np.binary_repr(pattern, width=num_inputs))+'_'+'stim'+'.png')
-        plt.close('all')
+#	plt.close('all')
 
 
 #def organoid(seq_num, input_pattern):

@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-#=====USAGE========================
-# To run code locally:
-# usage: python3 client.py runlocal
-# Otherwise request defaults to run through AWS
-#===================================
+#=====ignore this comment for now===
+#usage: python3 client.py host port
+#example: python3 client.py localhost 5001
+#======
 
 import sys
 import socket
@@ -17,10 +16,14 @@ import boto3
 import numpy as np
 
 #import protocol #defines internal Messaging format
-#from protocol import Message
+from protocol import Message
 
 
 def main():
+	c#print(("Arg1: %s Arg2: %s" % (sys.argv[1], sys.argv[2])))
+	s3 = boto3.client('s3')
+	bucket = 'braingeneers'
+
 	#create experiment guid
 	e_guid = str(uuid.uuid4())
 	print("Experiment guid", e_guid)
@@ -40,25 +43,16 @@ def main():
 		data["experiment"]["client_port"] = "5001"
 
 	if(data["experiment"]["input"] == "configured"):
-		x = np.array([[1, 10], [2, 10], [4, 10], [8, 10], [16, 10], [32, 10], [64, 10], [128, 10], [0, 10], [1, 10], [2, 10], [4, 10], [8, 10], [16, 10], [32, 10], [64, 10], [128, 10], [0, 10]])
+		x = np.array([[1, 10], [2, 10], [4, 10], [8, 10], [16, 10], [32, 10], [64, 10], [128, 10], [0, 10]])
 		f= e_guid + ".npy"
 		np.save(f, x)
-
-
-	if (len(sys.argv) > 1 and sys.argv[1] == "runlocal"):
-		print("Running Local!")
-		with open(e_guid + ".json", 'w') as fp:
-			json.dump(data, fp)
-	else:
-		#upload request to s3
-		s3 = boto3.client('s3')
-		bucket = 'katetemptestbucket'
 		#upload numpy to s3
 		key_npy = "experiments/" + e_guid + ".npy"
 		s3.upload_file(f, bucket, key_npy)
-		#upload main experiment request as json to s3, to activate trigger/request
-		key_json = "experiments/" + e_guid + ".json"
-		s3.put_object(Body=json.dumps(data), Bucket=bucket, Key=key_json)
+
+	#upload main experiment request as json to s3, to activate trigger/request
+	key_json = "experiments/" + e_guid + ".json"
+	s3.put_object(Body=json.dumps(data), Bucket=bucket, Key=key_json)
 
 
 	if(data["experiment"]["input"] == "dynamic"):
