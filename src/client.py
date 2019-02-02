@@ -44,7 +44,7 @@ def main():
 		f= e_guid + ".npy"
 		np.save(f, x)
 
-
+	# Option to run on local computer with no connection to s3
 	if (len(sys.argv) > 1 and sys.argv[1] == "runlocal"):
 		print("Running Local!")
 		with open(e_guid + ".json", 'w') as fp:
@@ -61,7 +61,7 @@ def main():
 		s3.put_object(Body=json.dumps(data), Bucket=bucket, Key=key_json)
 
 
-	if(data["experiment"]["input"] == "dynamic"):
+	if(data["experiment"]["input"] == "dynamic"): #for AI /interactive client
 		#wait for organoid to connect to start dynamic communication
 		#feedbackLoop()
 		#???Message.announce(sys.argv[2], sys.argv[1], socket.gethostname(), Message.CLIENT, 5001)
