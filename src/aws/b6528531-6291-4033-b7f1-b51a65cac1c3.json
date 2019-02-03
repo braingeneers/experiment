@@ -1,0 +1,18 @@
+{"experiment": {
+  "guid": "b6528531-6291-4033-b7f1-b51a65cac1c3",
+  "email": "kvoitiuk@ucsc.edu",
+  "type": "simulated",
+  "input": "configured",
+  "date": "01-28-19",
+  "payload": [
+      {"value": "00000001", "hold": "10"},
+      {"value": "00000010", "hold": "10"},
+      {"value": "00000100", "hold": "10"},
+      {"value": "00001000", "hold": "10"},
+      {"value": "00010000", "hold": "10"},
+      {"value": "00100000", "hold": "10"},
+      {"value": "01000000", "hold": "10"},
+      {"value": "10000000", "hold": "10"},
+      {"value": "00000000", "hold": "10"}
+    ]
+}}
