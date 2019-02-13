@@ -8,10 +8,9 @@ s3 = boto3.client('s3')
 sqs = boto3.client('sqs')
 
 email_from = 'kvoitiuk@ucsc.edu'
-#email_cc = ''
 emaiL_subject = 'AWS: File Uploaded to S3'
-bucket = 'braingeneers'
-key = 'results/'
+dest_bucket = 'braingeneers-providing'
+source_bucket = 'braingeneers-receiving'
 
 def lambda_handler(event, context):
 
@@ -19,13 +18,14 @@ def lambda_handler(event, context):
     #deeplearning
     guid = event['Records'][0]['body']
 
-    key = 'results/' + guid + '.json'
+    key_path = guid + '/'
+    key = guid + '.json'
 
-    link = 'https://s3-us-west-2.amazonaws.com/braingeneers/results/' + guid + '.json'
+    link = 'https://s3-us-west-2.amazonaws.com/' + dest_bucket + '/' + key_path + key
     email_body = 'Results are ready for the following experiment:\n' + guid + '\n\nLink:\n' + link
 
-    # Get the data from file
-    f = s3.get_object(Bucket=bucket, Key=key)
+    # Get email from original file
+    f = s3.get_object(Bucket=source_bucket, Key=key)
     data = json.load(f['Body'])
 
     # Read json values
@@ -38,10 +38,7 @@ def lambda_handler(event, context):
         Destination={
             'ToAddresses': [
                 email_to,
-            ],
-#          'CcAddresses': [
-#             email_cc,
-#            ]
+            ]
         },
         Message={
             'Subject': {

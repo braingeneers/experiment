@@ -21,9 +21,11 @@ def lambda_handler(event, context):
     f = s3.get_object(Bucket=bucket, Key=key)
     data = json.load(f['Body'])
 
+
     # Read json values
     experiment = data["experiment"]
     email_to = experiment["email"]
+
 
     #Distribute load------------------------------------
 
@@ -35,6 +37,7 @@ def lambda_handler(event, context):
 
     queue_url = queues['QueueUrls'][0]
 
+
     #enqueue request
     enqueue_response = sqs.send_message(QueueUrl=queue_url, MessageBody=experiment["guid"])
 
@@ -43,14 +46,14 @@ def lambda_handler(event, context):
     #augment json with organoid guid
     oguid = queue_url[queue_url.index("Queue")+len("Queue"):]
     experiment["oguid"] = oguid
-    s3.put_object(Body=json.dumps(data), Bucket=bucket, Key="results/" + guid + ".json")
+    experiment["email"] = " "
+    dest_bucket = 'braingeneers-providing'
+    s3.put_object(Body=json.dumps(data), Bucket=dest_bucket, Key="experiment["guid"]/" + experiment["guid"] + ".json")
 
 
-    return
     #email (optional)---------------------------------------------------
 
-    email_body = 'Success! Your experiment has been registered. \nExperiment GUID: ' + experiment["guid"] + '\nOrganoid:' + oguid
-
+    email_body = 'Success! Your experiment has been registered. \n\nExperiment GUID: ' + experiment["guid"] + '\n\nOrganoid: ' + oguid
 
     response = ses.send_email(
         Source = email_from,

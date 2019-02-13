@@ -31,11 +31,7 @@ from organoid import OrganoidSim
 
 
 def makeVideo():
-    #for
     os.system("ffmpeg -r 3 -i figures/out/img%d.png -vcodec mpeg4 -y figures/movie.mp4")
-
-
-
 
 def configuredExperiment(inputArray, filepath):
         #Iniialize Organoid
@@ -58,7 +54,6 @@ def configuredExperiment(inputArray, filepath):
 
 def dynamicExperiment():
         return
-
 
 def runLocal():
         return

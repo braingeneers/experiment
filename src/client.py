@@ -32,7 +32,7 @@ def main():
 			"email": "kvoitiuk@ucsc.edu",
 			"type": "simulated",
 			"input": "configured",
-			"date": "01-28-19"
+			"date": "02-12-19"
 	}}
 
 	if(data["experiment"]["input"] == "dynamic"):
@@ -52,12 +52,12 @@ def main():
 	else:
 		#upload request to s3
 		s3 = boto3.client('s3')
-		bucket = 'katetemptestbucket'
+		bucket = 'braingeneers-receiving'
 		#upload numpy to s3
-		key_npy = "experiments/" + e_guid + ".npy"
+		key_npy = e_guid + ".npy"
 		s3.upload_file(f, bucket, key_npy)
 		#upload main experiment request as json to s3, to activate trigger/request
-		key_json = "experiments/" + e_guid + ".json"
+		key_json = e_guid + ".json"
 		s3.put_object(Body=json.dumps(data), Bucket=bucket, Key=key_json)
 
 
