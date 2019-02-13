@@ -48,7 +48,7 @@ def lambda_handler(event, context):
     experiment["oguid"] = oguid
     experiment["email"] = " "
     dest_bucket = 'braingeneers-providing'
-    s3.put_object(Body=json.dumps(data), Bucket=dest_bucket, Key="experiment["guid"]/" + experiment["guid"] + ".json")
+    s3.put_object(Body=json.dumps(data), Bucket=dest_bucket, Key=experiment["guid"] + "/" + experiment["guid"] + ".json")
 
 
     #email (optional)---------------------------------------------------

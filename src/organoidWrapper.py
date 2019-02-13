@@ -126,7 +126,7 @@ def main():
                             path = os.getcwd() #get current working directory
                             for root,dirs,files in os.walk(path+"/figures"):
                                 for file in files:
-                                    s3.upload_file(os.path.join(root,file), dest_bucket, guid + "/" data + "/" + file)
+                                    s3.upload_file(os.path.join(root,file), dest_bucket, guid + "/" + "data" + "/" + file)
 
                             #Notify "Experiment Done" to AWS Lambda
                             done_queues = sqs.list_queues(QueueNamePrefix='requestCompleteQueue') # we filter to narrow down the list
