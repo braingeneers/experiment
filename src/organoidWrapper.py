@@ -68,7 +68,7 @@ def main():
         #...
         filepath = 'figures/'
         if (len(sys.argv) > 1 and sys.argv[1] == "runlocal"):
-            int("Running Local!")
+            print("Running Local!")
             f = "ec5600d8-17b5-45e5-93d6-2895119cb341.npy"
             inputArray = np.load(f)
             print(inputArray)
@@ -79,7 +79,9 @@ def main():
         else:
             sqs = boto3.client('sqs')
             s3 = boto3.client('s3')
-            bucket = 'katetemptestbucket'
+            source_bucket = 'braingeneers-receiving'
+            dest_bucket = 'braingeneers-providing'
+
 
             #find virtualExperimentQueues
             queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
@@ -97,8 +99,8 @@ def main():
                         print("Experiment guid:", guid)
 
                         #Get the experiment instructions json in s3
-                        key_json = "experiments/" + guid + ".json"
-                        f = s3.get_object(Bucket=bucket, Key=key_json)
+                        key_json = guid + ".json"
+                        f = s3.get_object(Bucket=source_bucket, Key=key_json)
                         data = json.load(f['Body'])
 
                         # Read json values
@@ -110,11 +112,11 @@ def main():
 
                         # Experiment configured or dynamic?
                         if(experiment["input"] == "configured"):
-                            key_npy = "experiments/" + guid + ".npy"
+                            key_npy = guid + ".npy"
                             print("Key:", key_npy)
                             f = guid + ".npy"
                             print("Local Filename:", f)
-                            s3.download_file(bucket, key_npy, f)
+                            s3.download_file(source_bucket, key_npy, f)
                             print("Downloaded!")
                             inputArray = np.load(f)
                             print(inputArray)
@@ -124,7 +126,7 @@ def main():
                             path = os.getcwd() #get current working directory
                             for root,dirs,files in os.walk(path+"/figures"):
                                 for file in files:
-                                    s3.upload_file(os.path.join(root,file), bucket, "results/" + guid + "/" + file)
+                                    s3.upload_file(os.path.join(root,file), dest_bucket, guid + "/" data + "/" + file)
 
                             #Notify "Experiment Done" to AWS Lambda
                             done_queues = sqs.list_queues(QueueNamePrefix='requestCompleteQueue') # we filter to narrow down the list
