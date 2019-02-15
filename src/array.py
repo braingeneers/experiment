@@ -35,7 +35,7 @@ LED_MASK = 128 #0x80
 #    wiringpi.shiftOut(1, 2, 0, 123)  # Shift out 123 (b1110110, byte 0-255) to data pin 1, clock pin 2
 
 
-class Array():
+class ArrayReal:
 
     def __init__(self, sdi, rclk, srclk):
         print("Initializing Array!!")
@@ -103,7 +103,7 @@ class Array():
     def statusRecievedMsg(self):
          wiringpi.digitalWrite(IND_SERVER_MSG_RCV, wiringpi.GPIO.HIGH)
 
-
+'''
 def main():
 
     myArray = Array(SDI, RCLK, SRCLK)
@@ -129,3 +129,4 @@ def main():
 
 if __name__ == '__main__':
 	  main()
+'''
