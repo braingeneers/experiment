@@ -297,7 +297,7 @@ def main():
 
                 else:
                     print("No requests, going to sleep...")
-                    time.sleep(60)        #dynamicExperiment()
+                    time.sleep(20)        #dynamicExperiment()
 
 
 
