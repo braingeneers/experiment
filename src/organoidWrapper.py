@@ -27,6 +27,10 @@ import random
 #from protocol import Message
 import organoid
 from organoid import OrganoidSim
+
+import array
+
+import
 #Usage: python3 organoidWrapper.py host port
 
 
@@ -82,7 +86,6 @@ def main():
             source_bucket = 'braingeneers-receiving'
             dest_bucket = 'braingeneers-providing'
 
-
             #find virtualExperimentQueues
             queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
             queue_url = queues['QueueUrls'][0]
@@ -134,6 +137,7 @@ def main():
                             enqueue_response = sqs.send_message(QueueUrl=done_queue_url, MessageBody=guid)
                         else:
                             return
+
                 else:
                     print("No requests, going to sleep...")
                     time.sleep(60)        #dynamicExperiment()
