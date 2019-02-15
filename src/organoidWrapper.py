@@ -27,10 +27,6 @@ import random
 #from protocol import Message
 import organoid
 from organoid import OrganoidSim
-
-import array
-
-import
 #Usage: python3 organoidWrapper.py host port
 
 

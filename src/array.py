@@ -3,6 +3,9 @@
 import wiringpi
 import numpy as np
 
+from picamera import PiCamera
+from time import sleep
+
 SDI = 27 #16 #//27   //serial data input
 RCLK =  29 #21 //28   //memory clock input(STCP)
 SRCLK =  28  #20 //29   //shift register clock input(SHCP)
@@ -60,7 +63,6 @@ class Array():
         self.pulse(self.rclk)
 
 
-
     def initPins(self): #set  pins as outputs
 
         wiringpi.wiringPiSetup()
@@ -108,6 +110,12 @@ def main():
     myArray.initPins()
 
     inputArray = np.array([[1, 1], [2, 1], [4, 1], [8, 1], [16, 1], [32, 1], [64, 1], [128, 1], [0, 1], [1, 1], [2, 1], [4, 1], [8, 1], [16, 1], [32, 1], [64, 1], [128, 1], [0, 1]])
+
+    camera = PiCamera()
+    camera.start_preview()
+    sleep(5)
+    camera.capture('/home/pi/Desktop/image.jpg')
+    camera.stop_preview()
 
     for input in inputArray:
         myArray.activate(int(input[0]))
