@@ -56,36 +56,52 @@ def dynamicExperiment():
         return
 
 def runLocal():
+        print("Running Local!")
+        f = "ec5600d8-17b5-45e5-93d6-2895119cb341.npy"
+        inputArray = np.load(f)
+        print(inputArray)
+        configuredExperiment(inputArray, filepath)
+        print("Done!")
+        with open(e_guid + ".json", 'w') as fp:
+            json.dump(data, fp)
         return
 
 def runWithAWS():
         return
 
+def findguid():
+    filepath = "../../guid.txt"
+    fd = open(filepath, "r")
+    return fd.readline().rstrip('\n')
+
+
+source_bucket = 'braingeneers-receiving'
+dest_bucket = 'braingeneers-providing'
+experiment_type = "virtualExperiment"
+
+
 def main():
-        #if no ~/<GUID>.txt, generate guid
-        #...
-        #if no <GUID>queue on sqs, generate queue
-        #...
         filepath = 'figures/'
         if (len(sys.argv) > 1 and sys.argv[1] == "runlocal"):
-            print("Running Local!")
-            f = "ec5600d8-17b5-45e5-93d6-2895119cb341.npy"
-            inputArray = np.load(f)
-            print(inputArray)
-            configuredExperiment(inputArray, filepath)
-            print("Done!")
-            with open(e_guid + ".json", 'w') as fp:
-                json.dump(data, fp)
-        else:
-            sqs = boto3.client('sqs')
-            s3 = boto3.client('s3')
-            source_bucket = 'braingeneers-receiving'
-            dest_bucket = 'braingeneers-providing'
+            runLocal()
 
-            #find virtualExperimentQueues
-            queues = sqs.list_queues(QueueNamePrefix='virtualExperimentQueue') # we filter to narrow down the list
-            queue_url = queues['QueueUrls'][0]
-            print(queue_url)
+        else:
+            sqs = boto3.resource('sqs')
+            s3 = boto3.resource('s3')
+
+            myguid = findguid()
+            print("My guid is: ", myguid)
+            queue_name = experiment_type + "Queue" + myguid
+
+            #check if <GUID>queue is on sqs
+            try:
+                queue = sqs.get_queue_by_name(QueueName=queue_name) # we filter to narrow down the list
+            except:
+                #create <GUID>queue
+                print("No queue found! Creating queue...")
+                queue = sqs.create_queue(QueueName=queue_name) # we filter to narrow down the list
+                print(queue.url)
+            exit()
 
             while True:
                 print("Getting message from sqs")

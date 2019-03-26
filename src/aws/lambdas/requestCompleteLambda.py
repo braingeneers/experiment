@@ -21,7 +21,8 @@ def lambda_handler(event, context):
     key_path = guid + '/'
     key = guid + '.json'
 
-    link = 'https://s3-us-west-2.amazonaws.com/' + dest_bucket + '/' + key_path + key
+    link = 'https://s3-us-west-2.amazonaws.com/' + dest_bucket + '/' + key_path + 'data/movie.mp4'
+
     email_body = 'Results are ready for the following experiment:\n' + guid + '\n\nLink:\n' + link
 
     # Get email from original file
