@@ -148,11 +148,15 @@ def main():
                             done_queue_url = done_queues['QueueUrls'][0]
                             enqueue_response = sqs.send_message(QueueUrl=done_queue_url, MessageBody=guid)
                         else:
+                            #dynamic experiment
+                            user_ip = experiment["client_ip"]
+                            user_port = int(experiment["client_port"])
+                            print(user_ip, user_port)
                             return
 
                 else:
                     print("No requests, going to sleep...")
-                    time.sleep(60)        #dynamicExperiment()
+                    time.sleep(60)
 
 
 

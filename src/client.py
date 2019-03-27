@@ -63,6 +63,7 @@ def main():
 
 	if(data["experiment"]["input"] == "dynamic"): #for AI /interactive client
 		#wait for organoid to connect to start dynamic communication
+		
 		#feedbackLoop()
 		#???Message.announce(sys.argv[2], sys.argv[1], socket.gethostname(), Message.CLIENT, 5001)
 		#???time.sleep(1)

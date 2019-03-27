@@ -192,6 +192,21 @@ def configuredExperiment(inputArray, filepath):
         return
 
 
+import socket
+import fcntl
+import struct
+
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
+
+
+
 def main():
         #if no ~/<GUID>.txt, generate guid
         #...
@@ -215,7 +230,7 @@ def main():
             ses = boto3.client('ses')
             email_from = email_to= 'kvoitiuk@ucsc.edu'
             emaiL_subject = 'Raspberry Pi is Online'
-            current_ip = str(socket.gethostbyname(socket.gethostname()))
+            current_ip = get_ip_address('eth0')
             email_body = current_ip
 
             response = ses.send_email(
