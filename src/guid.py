@@ -7,7 +7,12 @@ import re
 
 filepath = "../../guid.txt" #guid.txt should be outside of repository
 
-#check if there exists a guid.txt with a valid GUID
+# Ensure a guid.txt exists
+if(!os.path.isfile(filepath)):
+    fd = open(filepath, "w")
+
+
+# Ensure guid.txt has valid GUID
 fd = open(filepath, "r+")
 contents = fd.read()
 c = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}', re.I)
