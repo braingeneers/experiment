@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 job="@reboot $HOME/experiment/src/startup.sh &"
 # If not present, add startup cron job on machine:
 if ! crontab -l | grep -q -F job; then
@@ -10,6 +9,8 @@ if ! crontab -l | grep -q -F job; then
 fi
 
 #install requirements
+#pip install ...
 
 
 #reboot
+reboot -f
