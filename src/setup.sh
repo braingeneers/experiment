@@ -13,4 +13,4 @@ fi
 
 
 #reboot
-reboot -f
+#reboot -f
