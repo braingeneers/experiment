@@ -64,12 +64,30 @@ def findguid():
 
 
 def main():
-
+            m_ip = "127.0.0.1"
+            port = "5001"
             myguid = findguid()
-            print(myguid)
+            print("My guid is:", myguid)
 
-            exit()
+            print ('Master ip:', m_ip, 'Port', port)
+            s = socket.socket() #create socket
+            port = int(port) #bind to port
 
+    		# connect to server
+            host_ip = socket.gethostbyname(str(m_ip))
+            s.connect((host_ip, port))
+
+            while True:
+                # send 8 bit number
+                s.send(str(random.randint(0,255)).encode('utf-8'))
+                out = s.recv(128) # receive echo from client
+                print ('Recieved:', out)
+                time.sleep(1)
+
+            #-----------------------------------------------
+            s.close() #close socket
+            #-----------------------------------------------
+'''
             # Experiment configured or dynamic?
             if(experiment["input"] == "configured"):
                 key_npy = guid + ".npy"
@@ -88,7 +106,7 @@ def main():
                 user_port = int(experiment["client_port"])
                 print(user_ip, user_port)
                 return
-
+'''
 
 
 if __name__ == '__main__':
