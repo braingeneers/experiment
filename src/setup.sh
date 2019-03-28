@@ -15,6 +15,9 @@ fi
 #install requirements
 #pip install ...
 
+# Ensure valid GUID exists
+python3 guid.py
+
 
 #reboot
 reboot -f
