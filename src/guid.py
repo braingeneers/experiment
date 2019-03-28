@@ -8,7 +8,7 @@ import re
 filepath = "../../guid.txt" #guid.txt should be outside of repository
 
 # Ensure a guid.txt exists
-if(!os.path.isfile(filepath)):
+if(not os.path.isfile(filepath)):
     fd = open(filepath, "w")
 
 
