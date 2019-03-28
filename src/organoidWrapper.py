@@ -28,10 +28,8 @@ import random
 import organoid
 from organoid import OrganoidSim
 #Usage: python3 organoidWrapper.py host port
+from os.path import expanduser
 
-
-def makeVideo():
-    os.system("ffmpeg -r 3 -i figures/out/img%d.png -vcodec mpeg4 -y figures/movie.mp4")
 
 def configuredExperiment(inputArray, filepath):
         #Iniialize Organoid
@@ -55,108 +53,41 @@ def configuredExperiment(inputArray, filepath):
 def dynamicExperiment():
         return
 
-def runLocal():
-        print("Running Local!")
-        f = "ec5600d8-17b5-45e5-93d6-2895119cb341.npy"
-        inputArray = np.load(f)
-        print(inputArray)
-        configuredExperiment(inputArray, filepath)
-        print("Done!")
-        with open(e_guid + ".json", 'w') as fp:
-            json.dump(data, fp)
-        return
-
-def runWithAWS():
-        return
-
 def findguid():
-    filepath = "../../guid.txt"
-    fd = open(filepath, "r")
-    return fd.readline().rstrip('\n')
+    home = expanduser("~")
+    filepath = home + "/id.json" #id.json should be in homedirectory
+    with open(filepath) as json_file:
+        data = json.load(json_file)
+    return data["resource"]["guid"]
 
 
-source_bucket = 'braingeneers-receiving'
-dest_bucket = 'braingeneers-providing'
-experiment_type = "virtualExperiment"
 
 
 def main():
-        filepath = 'figures/'
-        if (len(sys.argv) > 1 and sys.argv[1] == "runlocal"):
-            runLocal()
-
-        else:
-            sqs = boto3.resource('sqs')
-            s3 = boto3.resource('s3')
 
             myguid = findguid()
-            print("My guid is: ", myguid)
-            queue_name = experiment_type + "Queue" + myguid
+            print(myguid)
 
-            #check if <GUID>queue is on sqs
-            try:
-                queue = sqs.get_queue_by_name(QueueName=queue_name) # we filter to narrow down the list
-            except:
-                #create <GUID>queue
-                print("No queue found! Creating queue...")
-                queue = sqs.create_queue(QueueName=queue_name) # we filter to narrow down the list
-                print(queue.url)
             exit()
 
-            while True:
-                print("Getting message from sqs")
-                # Get experiment request from queue
-                messages = sqs.receive_message(QueueUrl=queue_url,MaxNumberOfMessages=1, WaitTimeSeconds=20) # adjust MaxNumberOfMessages if needed
-                if 'Messages' in messages: # when the queue is exhausted response dict contains no 'Messages' key
-                        message = messages['Messages'][0] # 'Messages' is a list
-                        # process the messages
-                        guid = message['Body']
-                        print("Experiment guid:", guid)
+            # Experiment configured or dynamic?
+            if(experiment["input"] == "configured"):
+                key_npy = guid + ".npy"
+                print("Key:", key_npy)
+                f = guid + ".npy"
+                print("Local Filename:", f)
+                s3.download_file(source_bucket, key_npy, f)
+                print("Downloaded!")
+                inputArray = np.load(f)
+                print(inputArray)
+                configuredExperiment(inputArray, filepath)
 
-                        #Get the experiment instructions json in s3
-                        key_json = guid + ".json"
-                        f = s3.get_object(Bucket=source_bucket, Key=key_json)
-                        data = json.load(f['Body'])
-
-                        # Read json values
-                        experiment = data["experiment"]
-                        print(experiment)
-
-                        # Delete the message from queue
-                        sqs.delete_message(QueueUrl=queue_url,ReceiptHandle=message['ReceiptHandle'])
-
-                        # Experiment configured or dynamic?
-                        if(experiment["input"] == "configured"):
-                            key_npy = guid + ".npy"
-                            print("Key:", key_npy)
-                            f = guid + ".npy"
-                            print("Local Filename:", f)
-                            s3.download_file(source_bucket, key_npy, f)
-                            print("Downloaded!")
-                            inputArray = np.load(f)
-                            print(inputArray)
-                            configuredExperiment(inputArray, filepath)
-
-                            #upload results to s3
-                            path = os.getcwd() #get current working directory
-                            for root,dirs,files in os.walk(path+"/figures"):
-                                for file in files:
-                                    s3.upload_file(os.path.join(root,file), dest_bucket, guid + "/" + "data" + "/" + file)
-
-                            #Notify "Experiment Done" to AWS Lambda
-                            done_queues = sqs.list_queues(QueueNamePrefix='requestCompleteQueue') # we filter to narrow down the list
-                            done_queue_url = done_queues['QueueUrls'][0]
-                            enqueue_response = sqs.send_message(QueueUrl=done_queue_url, MessageBody=guid)
-                        else:
-                            #dynamic experiment
-                            user_ip = experiment["client_ip"]
-                            user_port = int(experiment["client_port"])
-                            print(user_ip, user_port)
-                            return
-
-                else:
-                    print("No requests, going to sleep...")
-                    time.sleep(60)
+            else:
+                #dynamic experiment
+                user_ip = experiment["client_ip"]
+                user_port = int(experiment["client_port"])
+                print(user_ip, user_port)
+                return
 
 
 

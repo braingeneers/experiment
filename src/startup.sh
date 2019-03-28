@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Pull latest code from GitHub
-cd ~/experiment/src
+cd ~/experiment
 git pull
 
 
@@ -11,17 +11,18 @@ filepath="$HOME/id.json" #stores program attribute
 
 if grep -q -F "master" $filepath; then
   # Launch master program
-  python3 master.py
+  python3 /src/master.py
   echo "Master Launched: master.py"
 
-elif grep -q -F "organoid-simulation" $filepath; then
+if grep -q -F "organoid-simulation" $filepath; then
   #launch real organoid wrapper
-  python3 organoidWrapper.py
+  python3 /src/organoidWrapper.py
   echo "Simulation Wrapper Launched: organoidWrapper.py"
 
-elif grep -q -F "organoid-real" $filepath; then
+if grep -q -F "organoid-real" $filepath; then
   #launch simulation organoid wrapper
-  python3 arrayWrapper.py
+  make
+  ./src/arrayWrapper
   echo "Organoid Wrapper Launched: arrayWrapper.py"
 
 else

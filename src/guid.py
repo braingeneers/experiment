@@ -16,9 +16,9 @@ home = expanduser("~")
 filepath = home + "/id.json" #id.json should be in homedirectory
 
 # Ensure an id.json exists
-if(os.path.isfile(filepath)):
-    print("id.json already exists")
-    exit() #done
+#if(os.path.isfile(filepath)):
+#    print("id.json already exists")
+#    exit() #done
 
 fd = open(filepath, "w")
 
@@ -34,18 +34,19 @@ fmt = "%H:%M:%S %d-%m-%Y %Z%z"
 # Make date timestamp
 localdate_string = now_pacific.strftime(fmt)
 
+#allows multiple processes on same machine
+input = input("Enter Types (eg. 1, 2, 3, 12, 13, 123): \n (1) master\n (2) organoid-simulated\n (3) organoid-real\n")
 
-input = input("Enter Type (#): \n (1) master\n (2) organoid-simulated\n (3) organoid-real\n")
+type = ""
+if (input.find('1') != -1):
+    type += "master "
+if (input.find('2') != -1):
+    type += "organoid-simulated "
+elif (input.find('3') != -1):
+    type += "organoid-real "
 
-
-
-if (input == "1"):
-    type = "master"
-elif (input == "2"):
-    type = "organoid-simulated"
-elif (input == "3"):
-    type = "organoid-real"
-
+# strip space from end
+type = type[0: -1]
 
 # Put JSON together
 data = {
@@ -53,8 +54,7 @@ data = {
 		"guid": guid,
 		"type": type,
 		"date-online": localdate_string
-    }
-}
+}}
 
 # Save JSON file
 with open(filepath, 'w') as fp:
