@@ -193,7 +193,7 @@ def configuredExperiment(inputArray, filepath):
 
 
 def get_ip_address():
-    f = os.popen("ifconfig wlan0 | grep "inet " | awk '{print $2}'")
+    f = os.popen("ifconfig wlan0 | grep 'inet ' | awk '{print $2}'")
     return f.read().rstrip('\r\n')
 
 
