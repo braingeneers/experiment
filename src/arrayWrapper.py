@@ -225,9 +225,6 @@ def main():
             current_ip = get_ip_address()
             email_body = current_ip
 
-            print(current_ip)
-            exit()
-
             response = ses.send_email(
                 Source = email_from,
                 Destination={
