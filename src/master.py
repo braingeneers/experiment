@@ -98,11 +98,13 @@ def main():
 
         while True:
 
-    	# Establish connection with client
-            input = c.recv(128).decode('utf-8')
-            print("Client sent: ", str(input))
+    	    # Establish connection with client
+            data = c.recv(496)#.decode('utf-8')
+            if not data: break
+
+            #print("Client sent: ", str(input))
             # echo 8 bit number
-            c.send(input.encode(decode('utf-8')))
+            c.send(data)#.encode(decode('utf-8')))
 
         #-----------------------------------------------
         c.close() #close connection with client

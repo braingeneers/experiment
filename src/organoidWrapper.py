@@ -20,6 +20,7 @@ import os.path
 import PIL
 import boto3
 import json
+import pickle
 #from PIL import Image
 #-----------------------------------------------
 import socket
@@ -77,12 +78,22 @@ def main():
             host_ip = socket.gethostbyname(str(m_ip))
             s.connect((host_ip, port))
 
-            while True:
-                # send 8 bit number
-                s.send(str(random.randint(0,255)).encode('utf-8'))
-                out = s.recv(128) # receive echo from client
-                print ('Recieved:', out)
-                time.sleep(1)
+            #while True:
+            # send 8 bit number
+            array = np.array([[1, 10], [2, 10], [4, 10]])
+            print ('Original:')
+            print(array)
+            data = pickle.dumps(array)
+
+            s.send(data)#str(random.randint(0,255)).encode('utf-8'))
+
+
+            data = s.recv(4096) # receive echo from client
+            data_array = pickle.loads(data)
+            print ('Recieved:')
+            print(data_array)#repr(data_array))
+            print(data_array[0])
+            time.sleep(1)
 
             #-----------------------------------------------
             s.close() #close socket
