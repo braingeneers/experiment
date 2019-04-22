@@ -9,7 +9,7 @@ import numpy as np
 
 import read_data
 #The following code will ingest an rhd file in a directory. Then once it has ingested it, it will create a file in 
-# /public/groups/braingeneers/archive/derived/"name of the created file" with the numpy files.
+# /public/groups/braingeneers/archive/derived/"name of the created directory" with the numpy files.
 
 parser = argparse.ArgumentParser(
     description="Ingest a batch of experiments")
