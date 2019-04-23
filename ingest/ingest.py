@@ -37,12 +37,16 @@ batch_metadata = {
 
 experiments = []
 
+
 # Add any metadata from json files to the batch metadata
 for f in glob.glob("original/{}/*.json".format(args.uuid)):
     batch_metadata.update(json.load(open(f)))
 
 # Ingest each experiment and exhaust in normalized form into derived/<args.uuid>/
-for original_path in sorted(glob.glob("original/{}/*/".format(args.uuid))):
+
+#Fixed 4/23/19 --cph
+#for original_path in sorted(glob.glob("original/{}/*/".format(args.uuid))):
+for original_path in sorted(glob.glob("original/{}".format(args.uuid))):
 
     experiment_metadata = {}
 
