@@ -81,8 +81,12 @@ for original_path in sorted(glob.glob("original/{}".format(args.uuid))):
         sample_metadata["name"] = os.path.splitext(
             os.path.basename(sample_path).replace(" ", "-"))[0]
 
+        #cph chokes on e.g. organoid_3_p1_190425_162122.rhd  
+        #sample_metadata["timestamp"] = datetime.datetime.strptime(
+        #    re.findall(r"_(\d+_\d+)", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
+
         sample_metadata["timestamp"] = datetime.datetime.strptime(
-            re.findall(r"_(\d+_\d+)", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
+            re.findall(r"_(\d\d\d\d\d\d_\d\d\d\d\d\d)", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
 
         if "timestamp" not in batch_metadata:
             batch_metadata["timestamp"] = sample_metadata["timestamp"]
