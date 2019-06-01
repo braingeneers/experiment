@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Ingest a batch of experiments consisting of one or more RHD files and meta
+data each into a set of numpy files and json metadata files.
+
+See https://github.com/braingeneers/internal/wiki for details
+"""
 
 import os
 import re
@@ -11,8 +17,6 @@ import datetime
 import numpy as np
 
 import read_data
-#The following code will ingest an rhd file in a directory. Then once it has ingested it, it will create a file in 
-# derived/UUID with the correct files.
 
 parser = argparse.ArgumentParser(
     description="Ingest a batch of experiments")
@@ -32,41 +36,51 @@ os.makedirs("derived/{}".format(args.uuid), exist_ok=True)
 batch_metadata = {
     "uuid": args.uuid,
     "issue": "https://github.com/braingeneers/internal/issues/{}".format(args.issue),
-    "notes": "\n".join([open(f).read() for f in glob.glob("original/{}/*.txt".format(args.uuid))])
+    "notes": open("original/{}/batch.txt".format(args.uuid)).read() if os.path.exists(
+        "original/{}/batch.txt".format(args.uuid)) else ""
 }
 
 experiments = []
 
-
-# Add any metadata from json files to the batch metadata
-for f in glob.glob("original/{}/*.json".format(args.uuid)):
-    batch_metadata.update(json.load(open(f)))
+# # Add any metadata from json files to the batch metadata
+# for f in glob.glob("original/{}/*.json".format(args.uuid)):
+#     batch_metadata.update(json.load(open(f)))
 
 # Ingest each experiment and exhaust in normalized form into derived/<args.uuid>/
 
-#Fixed 4/23/19 --cph
-#for original_path in sorted(glob.glob("original/{}/*/".format(args.uuid))):
-for original_path in sorted(glob.glob("original/{}".format(args.uuid))):
+# Get a list of all the experiments by extracting unique prefixes
+rhds = sorted(glob.glob("original/{}/*.rhd".format(args.uuid)))
+experiment_names = sorted(set(
+    [re.findall(r"(.*?)\/(.*?)\/(.*?)_(\d{6}_\d{6}).rhd", s)[0][2] for s in rhds]))
+print("Experiment names:", experiment_names)
+
+for experiment_name in experiment_names:
+    print("Ingesting experiment", experiment_name)
 
     experiment_metadata = {}
 
-    experiment_metadata["name"] = os.path.basename(
-        os.path.normpath(original_path)).replace(" ", "-")
-    print("Experiment {} from {}".format(experiment_metadata["name"], original_path))
+    experiment_metadata["name"] = experiment_name
 
-    # Concatenate all *.txt files into a "notes" field
-    experiment_metadata["notes"] = "\n".join(
-        [open(f).read() for f in glob.glob("{}/*.txt".format(original_path))])
+    # Add <experiment_name>.txt to the notes field
+    if os.path.exists("original/{}/{}.txt".format(args.uuid, experiment_name)):
+        experiment_metadata["notes"] = open(
+            "original/{}/{}.txt".format(args.uuid, experiment_name)).read()
+    else:
+        experiment_metadata["notes"] = ""
 
-    # Walk through each *.rhd in the experiment sorted alphabetically and therefore by time
+    # Find all the rhd's that match the experiment name and walk through in sorted/time order
     experiment_metadata["samples"] = []
-    for sample_path in sorted(glob.glob("{}/*.rhd".format(original_path))):
+    rhds = [p for p in sorted(glob.glob("original/{}/*.rhd".format(args.uuid)))
+            if re.findall(r"(.*?)\/(.*?)\/(.*?)_(\d{6}_\d{6}).rhd", p)[0][2] == experiment_name]
+    print("Original rhd files to ingest:", rhds)
 
-        print("Sample {}".format(sample_path))
+    for sample_path in rhds:
+        print("Reading sample {}".format(sample_path))
 
         # Try reading its *.rhd file stopping if there is an error. Any earlier
         # samples in the run will be retained and stored but with an "error" field
         # in the experiments metadata
+        data = read_data.read_data(sample_path)
         try:
             data = read_data.read_data(sample_path)
         except Exception as e:
@@ -81,12 +95,9 @@ for original_path in sorted(glob.glob("original/{}".format(args.uuid))):
         sample_metadata["name"] = os.path.splitext(
             os.path.basename(sample_path).replace(" ", "-"))[0]
 
-        #cph chokes on e.g. organoid_3_p1_190425_162122.rhd  
-        #sample_metadata["timestamp"] = datetime.datetime.strptime(
-        #    re.findall(r"_(\d+_\d+)", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
-
         sample_metadata["timestamp"] = datetime.datetime.strptime(
-            re.findall(r"_(\d\d\d\d\d\d_\d\d\d\d\d\d)", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
+            re.findall(r"_(\d{6}_\d{6})", sample_metadata["name"])[0], "%y%m%d_%H%M%S").isoformat()
+        print(sample_metadata["timestamp"])
 
         if "timestamp" not in batch_metadata:
             batch_metadata["timestamp"] = sample_metadata["timestamp"]
@@ -105,9 +116,9 @@ for original_path in sorted(glob.glob("original/{}".format(args.uuid))):
 
         experiment_metadata["samples"].append(sample_metadata)
 
-    # Add any metadata from json files to the experiment metadata
-    for f in glob.glob("{}/*.json".format(original_path)):
-        experiment_metadata.update(json.load(open(f)))
+    # # Add any metadata from json files to the experiment metadata
+    # for f in glob.glob("{}/*.json".format(original_path)):
+    #     experiment_metadata.update(json.load(open(f)))
 
     # Save the meta data for this experiment
     with open("derived/{}/{}.json".format(args.uuid, experiment_metadata["name"]), "w") as f:

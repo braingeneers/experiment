@@ -5,7 +5,7 @@ import numpy as np
 from intanutil.read_header import read_header
 from intanutil.get_bytes_per_data_block import get_bytes_per_data_block
 from intanutil.read_one_data_block import read_one_data_block
-from intanutil.notch_filter import notch_filter
+# from intanutil.notch_filter import notch_filter
 from intanutil.data_to_result import data_to_result
 
 
@@ -192,23 +192,28 @@ def read_data(filename):
         data['t_dig'] = data['t_amplifier']
         data['t_temp_sensor'] = data['t_supply_voltage']
 
+        """
+        NOTE: Instead of applying the notch filter as the original below codes
+        does we just store the original raw data. This preserves the option for downstream
+        analysis to apply or not apply
+        """
         # If the software notch filter was selected during the recording, apply the
         # same notch filter to amplifier data here.
-        assert header['notch_filter_frequency'] == 0
-        if header['notch_filter_frequency'] > 0:
-            print('Applying notch filter...')
+        # assert header['notch_filter_frequency'] == 0
+        # if header['notch_filter_frequency'] > 0:
+        #     print('Applying notch filter...')
 
-            print_increment = 10
-            percent_done = print_increment
-            for i in range(header['num_amplifier_channels']):
-                data['amplifier_data'][i, :] = notch_filter(
-                    data['amplifier_data'][i, :], header['sample_rate'],
-                    header['notch_filter_frequency'], 10)
+        #     print_increment = 10
+        #     percent_done = print_increment
+        #     for i in range(header['num_amplifier_channels']):
+        #         data['amplifier_data'][i, :] = notch_filter(
+        #             data['amplifier_data'][i, :], header['sample_rate'],
+        #             header['notch_filter_frequency'], 10)
 
-                fraction_done = 100 * (i / header['num_amplifier_channels'])
-                if fraction_done >= percent_done:
-                    print('{}% done...'.format(percent_done))
-                    percent_done += print_increment
+        #         fraction_done = 100 * (i / header['num_amplifier_channels'])
+        #         if fraction_done >= percent_done:
+        #             print('{}% done...'.format(percent_done))
+        #             percent_done += print_increment
     else:
         data = []
 
