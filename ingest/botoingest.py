@@ -7,67 +7,62 @@ import json
 import argparse
 import datetime
 import numpy as np
-
+import boto3
+import botocore
 import read_data
 
+#Established arguments. 
 parser = argparse.ArgumentParser(
     description="Ingest a batch of experiments")
-#parser.add_argument('--uuid', required=True,
-#                    help="UUID for batch")
 parser.add_argument('--issue', required=True,
                    help="Github issue is in internal")
 args = parser.parse_args()
 
-import boto3
-import botocore
-
+#Gets the current date
 now = datetime.datetime.now()
 
-BUCKET_NAME = 'braingeneers-inbox' # replace with your bucket name
-
+#Establishes AWS Bucket
+BUCKET_NAME = 'braingeneers-inbox' \
 s3 = boto3.resource('s3')
 
 
-#gets all the emails and makes a firectory wiht each which has ll the things in the directory
+#gets all the emails and makes directories with the names of the emails that put the files in
 def download_directory_from_s3(bucketName,remoteDirectoryNames):
     s3_resource = boto3.resource('s3')
     bucket = s3_resource.Bucket(bucketName)
 
     for remoteDirectoryName in remoteDirectoryNames:
-        #print(remoteDirectoryName)
+        
         for key in bucket.objects.filter(Prefix = remoteDirectoryName):
-            #print(key)
+            
 
             if not os.path.exists(os.path.dirname(key.key)):
                 os.makedirs(os.path.dirname(key.key))
-          #  print("The Directory being made: "+ os.path.dirname(key.key) +" What is being downloaded in it: "+ key.key)
+          
             bucket.download_file(key.key,key.key)
 
-def copy_directory(src, dest):
-    try:
-        shutil.copytree(src, dest)
-    # Directories are the same
-    except shutil.Error as e:
-        print('Directory not copied. Error: %s' % e)
-    # Any error saying that the directory doesn't exist
-    except OSError as e:
-        print('Directory not copied. Error: %s' % e)
 
 remoteDirectories=['asrobbin@ucsc.edu']
+
+
 
 formerPath=os.getcwd()
 print("In Directory : " +os.getcwd())
 path="%s/original" %str(os.getcwd())
+
+#I am changing which directory I am in so I when I download the directories from AWS they will automatically go into "original"
 os.chdir(path)
 print("In Directory : " +os.getcwd())
+#downloading directories into original
 download_directory_from_s3(BUCKET_NAME,remoteDirectories)
+
+#Change path back to normal
 os.chdir(formerPath)
 print("In Directory : "+ os.getcwd())
-#for remoteDirectory in remoteDirectories:
- #   copy_directory(remoteDirectory,"original/{}".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0], exist_ok=True))
 
 
 
+#renames all the directories into 0000-00-00-email for proper identification
 for remoteDirectory in remoteDirectories:
     os.rename("original/{}".format(remoteDirectory),"original/{}".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0]))
 
@@ -76,13 +71,15 @@ for remoteDirectory in remoteDirectories:
 for remoteDirectory in remoteDirectories:
     print("Ingesting batch {}".format(remoteDirectory))
 
-    #deletes the director if it already exists
+    #deletes the directory for an ingest if the batch had been ingested before
     try:
         shutil.rmtree("derived/{}".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0], exist_ok=True))
     except OSError:
         pass
-    #makes the directory with the guid
+    
+    #makes the directory with the correct identification(0000-00-00-email) in derived
     os.makedirs("derived/{}".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0], exist_ok=True))
+    
     #declares batch_metadata
     batch_metadata = {
     "uuid": now.strftime("%Y-%m-%d")+"-"+ remoteDirectory.partition("@")[0],
@@ -94,19 +91,16 @@ experiments = []
 
 
 
-# # Add any metadata from json files to the batch metadata
-# for f in glob.glob("original/{}/*.json".format(args.uuid)):
-#     batch_metadata.update(json.load(open(f)))
-
-# Ingest each experiment and exhaust in normalized form into derived/<args.uuid>/
 
 # Get a list of all the experiments by extracting unique prefixes
 
 
 
 for remoteDirectory in remoteDirectories:
-
+    
+    #Gets all the rhd files for a directory
     rhds = sorted(glob.glob("original/{}/*.rhd".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0], exist_ok=True)))
+    #Gets all of the experiment names from the rhd files
     experiment_names = sorted(set(
         [re.findall(r"(.*?)\/(.*?)\/(.*?)_(\d{6}_\d{6}).rhd", s)[0][2] for s in rhds]))
     print("Experiment names:", experiment_names)
@@ -175,10 +169,7 @@ for remoteDirectory in remoteDirectories:
             np.save(sample_metadata["derived"], data["amplifier_data"])
 
             experiment_metadata["samples"].append(sample_metadata)
-            
-    # # Add any metadata from json files to the experiment metadata
-    # for f in glob.glob("{}/*.json".format(original_path)):
-    #     experiment_metadata.update(json.load(open(f)))
+
 
     # Save the meta data for this experiment
         with open("derived/{}/{}.json".format(now.strftime("%Y-%m-%d")+"-"+remoteDirectory.partition("@")[0], experiment_metadata["name"]), "w") as f:
@@ -204,7 +195,7 @@ for removeThis in remoteDirectories:
     except:
         pass
 
-##for f in glob.glob("derived/{}".format(remoteDirectory)):
+#for f in glob.glob("derived/{}".format(remoteDirectory)):
 for remoteDirectory in remoteDirectories:
     if (len(os.listdir("derived/{}".format(now.strftime("%Y-%m-%d")+"-"+ remoteDirectory.partition("@")[0])))==1):
         shutil.rmtree("derived/{}".format(now.strftime("%Y-%m-%d")+"-"+ remoteDirectory.partition("@")[0]))
