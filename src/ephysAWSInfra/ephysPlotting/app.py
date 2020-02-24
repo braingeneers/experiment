@@ -6,10 +6,24 @@ import dash_html_components as html
 import numpy as np
 import pandas as pd
 import base64
+import os
+from itertools import islice
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-num = 1
+
+filename = 'I-2020-02-05-21-20-50-1k'
+N = 32
+
+with open(filename) as fd:
+    fd.seek(6)
+    A = np.asarray([i.strip() for i in islice(fd, N)]).reshape((1, 32))
+    j=0
+    for k in range(50):
+        data = np.asarray([i.strip() for i in islice(fd, N)]).reshape((1, 32))
+        A = np.append(A, data, axis=0)
+    #print(A)
+
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -21,27 +35,32 @@ app.layout = html.Div(children=[
     html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), height=40),
     html.H1(children='ePhys Portal'),
 
-    dcc.Input(id='input', value='Enter UUID', type='text'),
-    html.Div(id='output'),
+    dcc.Input(id='input', value='1', type='text'),
+    html.Div(id='output-graph'),
 
-    dcc.Graph(
+])
+
+@app.callback(
+    Output(component_id='output-graph', component_property='children'),
+    [Input(component_id='input', component_property='value')])
+
+def update_graph(input_data):
+    num = int(input_data)
+    return dcc.Graph(
         id='example-graph',
         figure={
             'data': [
-                {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'line', 'name': 'SF'},
+                #{'x': [1, 2, 3], 'y': [1, 2, 3], 'type': 'line'}
+                {'y': A[:,num], 'type': 'line', 'name': num},
+
             ],
             'layout': {
                 'title': 'Channel ' + str(num),
             }
         }
     )
-])
 
-@app.callback(
-    Output(component_id='output', component_property='children'),
-    [Input(component_id='input', component_property='value')])
 
-def update_value(input_data):
     return "Input: {}".format(input_data)
 
 if __name__ == '__main__':
