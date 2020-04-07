@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: inbox-sequential-example
+spec:
+  ttlSecondsAfterFinished: 90
+  backoffLimit: 0
+  template:
+    spec:
+      initContainers:
+      - name: task1
+        image: busybox
+        command: ["echo", "Sequential Task 1 Ran!"]
+        resources: 
+          requests: 
+            cpu: "100m" 
+            memory: "100Mi" 
+          limits: 
+            cpu: "1" 
+            memory: "1Gi"
+      - name: task2
+        image: busybox
+        command: ["echo", "Sequential Task 2 Ran!"]
+        resources: 
+          requests: 
+            cpu: "100m" 
+            memory: "100Mi" 
+          limits: 
+            cpu: "1" 
+            memory: "1Gi"
+      containers:
+      - name: task-done
+        image: busybox
+        imagePullPolicy: Always
+        command: ["echo", "All sequential tasks finished!"]
+        resources: 
+          requests: 
+            cpu: "100m" 
+            memory: "100Mi" 
+          limits: 
+            cpu: "1" 
+            memory: "1Gi"
+      restartPolicy: Never
+
