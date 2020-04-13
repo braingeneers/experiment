@@ -12,6 +12,9 @@ spec:
         image: busybox
         imagePullPolicy: Always
         command: ["echo", "Task finished!"]
+        env:
+          - name: UUID
+            value: $UUID
         resources: 
           requests: 
             cpu: "100m" 
