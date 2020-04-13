@@ -11,7 +11,9 @@ spec:
       - name: task
         image: busybox
         imagePullPolicy: Always
-        command: ["echo", "Task finished!"]
+        command: ["/bin/bash", "-c"]
+        args:
+          - python3 download_from_prp.py ...(other commands)
         env:
           - name: UUID
             value: $UUID
