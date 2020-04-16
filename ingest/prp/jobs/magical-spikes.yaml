@@ -1,11 +1,11 @@
 apiVersion: batch/v1                                                                                                                  kind: Job                                                                                                                             metadata:                                                                                                                             
-  name: magical-spikes
+  name: example-spikes
 spec:                                                                                                                                   backoffLimit: 0
   template:                                                                                                                               metadata:
       labels:                                                                                                                         
         app: my-app
     spec:                                                                                                                                   containers:
-      - name: magical-spikes
+      - name: example-spikes
         image: nrezaee/make_features:latest
         imagePullPolicy: Always
         resources:                                                                                                                    
