@@ -2,10 +2,9 @@
 
 If someone has an amazing new analysis that they want to use on the data, they have to recreate the same analysis on each new data set. They could give me their analysis to automate into ingest, but then I would have to take the time to understand the analysis in order to correctly and efficiently automate it, while also downloading the right packages. With the kubernetes jobs, one can automatically upload the analysis they want done and then have it done with all subsequent data sets. 
 
-## Getting Started Part 1: Alter Files
+## Getting Started Part 1: Git Clone and Adding your scripts
 
-In order to first begin making you analysis job, git clone the experiment/ingest/prp/example-spikes/ folder. You will not need to alter the download_batch.py file, which will automatically download a batch. You will need to alter the make_example_spikes.py to run with the specific analys you want. After that you will have to change the file from saving to /public/groups/braingeneers/ephys/$UUID/example_spikes/ to /public/groups/braingeneers/ephys/$UUID/{your analysis name}/. Then you must alter the upload_feature.py to save to the correct directory as well. Throughout altering these files remember that they must be able to take in an environment variable called "UUID".
-
+In order to first begin making you analysis job, git clone the experiment/ingest/prp/example-spikes/ folder. You will not need to alter the download_batch.py file, which will automatically download a batch. You will need to replace the make_example_spikes.py with a script that can take an environment variable called "UUID" and output the results into a folder like /public/groups/braingeneers/ephys/UUID/example_spikes/. After that you will have to change the file from saving to /public/groups/braingeneers/ephys/$UUID/example_spikes/ to /public/groups/braingeneers/ephys/$UUID/{your analysis name}/. Then you must alter the upload_feature.py to save to upload to the correct directory as well. 
 ## Getting Started Part 2: Alter Dockerfile and Create Image
 Make sure you add RUN commands in your Dockerfile in case you need other packages for you analysis.
 On the command line run this in the same directory to build and push you image:
