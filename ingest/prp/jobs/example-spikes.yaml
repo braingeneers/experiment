@@ -1,10 +1,15 @@
-apiVersion: batch/v1                                                                                                                  kind: Job                                                                                                                             metadata:                                                                                                                             
+apiVersion: batch/v1 
+kind: Job 
+metadata:                                                                                                                             
   name: example-spikes
-spec:                                                                                                                                   backoffLimit: 0
-  template:                                                                                                                               metadata:
+spec:
+  backoffLimit: 0
+  template: 
+    metadata:
       labels:                                                                                                                         
         app: my-app
-    spec:                                                                                                                                   containers:
+    spec:
+      containers:
       - name: example-spikes
         image: nrezaee/make_features:latest
         imagePullPolicy: Always
@@ -23,7 +28,7 @@ spec:                                                                           
             value: "http://rook-ceph-rgw-nautiluss3.rook"                                                                             
           - name: UUID                                                                                                                
             value: ${UUID}                                                                                                            
-                                                                                                                                              volumeMounts:                                                                                                                 
+        volumeMounts:                                                                                                                 
           - name: "prp-s3-credentials"                                                                                                
             mountPath: "/root/.aws/credentials"                                                                                       
             subPath: "credentials"
