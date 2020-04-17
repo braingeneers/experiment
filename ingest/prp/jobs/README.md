@@ -9,8 +9,10 @@ In order to first begin making your analysis job, git clone the experiment/inges
 ## Getting Started Part 2: Alter Dockerfile and Create Image
 Make sure you add RUN commands in your Dockerfile in case you need other packages for your analysis.
 On the command line run this in the same directory to build and push your image:
+<pre><code>
 docker build -t {username}/{name_for_your_image} .
 docker push {username}/{name_for_your_image}:latest 
+</code></pre>
 
 ## Getting Started Part 3: Alter .yaml file
 
