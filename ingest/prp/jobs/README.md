@@ -63,7 +63,7 @@ kubectl exec -it nico-spikes-vxjfw bash
 
 From there you can run your scripts to make sure they work: <pre><code> download_batch.py && python3 make_example_spikes.py && python3 upload_feature.py</code></pre>
 
-## Getting Started Part 5: Final Touches
+## Getting Started Part 5: Final Touches and Push to Github
 
 Once you have tested everything, and you are sure that everything works make sure you args look like this so everything can run automatically:
 <pre><code>
@@ -72,6 +72,10 @@ command: ["/bin/bash", "-c" ]
     - python3 download_batch.py && python3 make_example_spikes.py && python3 upload_feature.py
   env:
 </code></pre>
+
+Add only your yaml file to experiment/ingest/prp/jobs/ephys/ and it will be automatically incorporated into the next ingest.
+
+
 
 
 
