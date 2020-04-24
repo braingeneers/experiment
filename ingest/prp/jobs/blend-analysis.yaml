@@ -1,0 +1,51 @@
+apiVersion: batch/v1 
+kind: Job 
+metadata:                                                                                                                             
+  name: blend-analysis
+spec:
+  backoffLimit: 0
+  template: 
+    metadata:
+      labels:                                                                                                                         
+        app: my-app
+    spec:
+      containers:
+      - name: blend-analysis
+        image: nrezaee/blend-analysis-container:latest   
+        imagePullPolicy: Always
+        resources:                                                                                                                    
+          requests:
+            cpu: "1"                                                                                                                  
+            memory: "2Gi"                                                                                                             
+          limits:                                                                                                                     
+            cpu: "8"                                                                                                                  
+            memory: "32Gi"                                                                                                            
+        command: ["/bin/bash", "-c" ]                                                                                                 
+        args:                                                                                                                         
+         # - sleep 1d 
+         - python3 download_batch.py && python3 make_blend_analysis.py && python3 upload_feature.py                                  
+        env:                                                                                                                          
+          - name: ENDPOINT_URL                                                                                                        
+            value: "http://rook-ceph-rgw-nautiluss3.rook"                                                                             
+          - name: UUID                                                                                                                
+            value: ${UUID}                                                                                                            
+        volumeMounts:                                                                                                                 
+          - name: "prp-s3-credentials"                                                                                                
+            mountPath: "/root/.aws/credentials"                                                                                       
+            subPath: "credentials"
+          - name: "prp-s3-credentials"                                                                                                
+            mountPath: "/root/.s3cfg"
+            subPath: ".s3cfg"                                                                                                         
+          - name: "ram-disk"
+            mountPath: "/tmp/tfrecords"                                                                                               
+      restartPolicy: Never                                                                                                            
+      volumes:                                                                                                                        
+        # Secrets file for nautilus s3 credentials .aws/credentials and .s3cfg                                                        
+        - name: prp-s3-credentials                                                                                                    
+          secret:                                                                                                                     
+            secretName: prp-s3-credentials                                                                                            
+        # RAM disk
+        - name: ram-disk                                                                                                              
+          emptyDir:
+            medium: "Memory"
+            
