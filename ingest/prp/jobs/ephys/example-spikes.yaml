@@ -1,7 +1,7 @@
 apiVersion: batch/v1 
 kind: Job 
 metadata:                                                                                                                             
-  name: example-spikes
+  name: example-spikes-${UUID}        
 spec:
   backoffLimit: 0
   template: 
