@@ -3,6 +3,7 @@ kind: Job
 metadata:                                                                                                                             
   name: nahawtho-spikes-${UUID}
 spec:
+  ttlSecondsAfterFinished: 1
   backoffLimit: 0
   template: 
     metadata:
