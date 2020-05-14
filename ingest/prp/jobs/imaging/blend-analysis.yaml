@@ -3,6 +3,7 @@ kind: Job
 metadata:                                                                                                                             
   name: blend-analysis
 spec:
+  ttlSecondsAfterFinished: 1
   backoffLimit: 0
   template: 
     metadata:
