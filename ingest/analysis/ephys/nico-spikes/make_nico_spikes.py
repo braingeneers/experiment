@@ -59,7 +59,7 @@ for i in range(len(batch_metadata['experiments'])):
     recording_cmr = st.preprocessing.common_reference(recording_f, reference='median')                              
                                                                                                                     
     sorting_MS4 = sorting_MS4 = sorters.run_mountainsort4(recording_f, num_workers=15,                              
-                                    freq_min=None, freq_max=None, filter=True,
+                                    freq_min=None, freq_max=None, filter=False,
                                     detect_threshold=5, detect_interval= 20,                                        
                                    adjacency_radius=None)
                                    
