@@ -1,0 +1,86 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron-ingest
+spec: # CronJob
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid 
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 1 
+      template:
+        metadata:
+          labels:
+            app: my-app 
+        spec:
+          initContainers:
+          - name: task1
+            image: nrezaee/prp-ingest-container:latest
+            command: ["/bin/bash", "-c",]
+            args: 
+            #- sleep 1d
+            - aws --endpoint https://s3.nautilus.optiputer.net s3 ls s3://braingeneers-inbox/
+            resources: 
+              requests: 
+                cpu: "10m" 
+                memory: "10Mi" 
+              limits: 
+                cpu: "1" 
+                memory: "1Gi"
+            volumeMounts:
+              - name: "prp-s3-credentials"
+                mountPath: "/root/.aws/credentials"
+                subPath: "credentials"
+              - name: "prp-s3-credentials"
+                mountPath: "/root/.s3cfg"
+                subPath: ".s3cfg"
+              - name: "kube-config"
+                mountPath: "/root/.kube/"
+          containers:
+          - name: nrezaee-container
+            image: nrezaee/prp-ingest-container:latest
+            imagePullPolicy: Always
+            resources:
+              requests:
+                cpu: "1"
+                memory: "2Gi"
+              limits:
+                cpu: "8"
+                memory: "32Gi"
+            command: ["/bin/bash", "-c" ]
+            args:
+             # - echo "It Worked" 
+             # - sleep 1d
+              - source run_ingest.sh
+            env:
+              - name: ENDPOINT_URL
+                value: "http://rook-ceph-rgw-nautiluss3.rook"
+              - name: UUID
+                value: $UUID
+
+            volumeMounts:
+              - name: "prp-s3-credentials"
+                mountPath: "/root/.aws/credentials"
+                subPath: "credentials"
+              - name: "prp-s3-credentials"
+                mountPath: "/root/.s3cfg"
+                subPath: ".s3cfg"
+              - name: "kube-config"
+                mountPath: "/root/.kube/"
+          restartPolicy: Never
+          volumes:
+            # Secrets file for nautilus s3 credentials .aws/credentials and .s3cfg
+            - name: kube-config
+              secret:
+                secretName: kube-config
+            - name: prp-s3-credentials
+              secret:
+                secretName: prp-s3-credentials
+            # RAM disk
+            - name: ram-disk
+              emptyDir:
+                medium: "Memory"
+      
+
