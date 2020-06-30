@@ -2,7 +2,7 @@
 
 This document describes how to upload files to the PRP either directly or with the Braingeneers Inbox.
 
-### Ephys at UCSC ###
+## Ephys at UCSC ##
 
 1. Must include a batch.txt for notes
 
@@ -17,9 +17,9 @@ This document describes how to upload files to the PRP either directly or with t
 Example: **organoid1_000000_000000.rhd** , **organoid2_000000_000000.rhd** , **organoid1.txt** , **organoid2.txt** , and **batch.txt** should be zipped into **2020-04-28-e-silicon**
 
 
-### Imaging ###
+## Imaging ##
 
 
 
-### Fluidics ###
+## Fluidics ##
 
