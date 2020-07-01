@@ -8,7 +8,6 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 	apt-get install -y kubectl
 
 COPY prp_ingest.py ./prp_ingest.py
-COPY 256ANS_locs.csv ./256ANS_locs.csv
 COPY read_data.py ./read_data.py
 COPY grab_files_from_derived.py ./grab_files_from_derived.py
 COPY intanutil ./intanutil
