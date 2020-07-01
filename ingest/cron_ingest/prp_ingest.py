@@ -13,25 +13,10 @@ import grab_files_from_derived
 from numpy import genfromtxt
 import pickle
 
-#with open ('uuid.txt', 'rb') as fp: 
-#    args_uuid = str(pickle.load(fp))
 
 args_uuid = os.getenv('UUID')
 
-#args_uuid = '0000-00-00-e-stuff'
 args_issue = '0'
-# #Creates the arguments of uuid and issue
-# #--------------------------------------------------------------------------------
-# parser = argparse.ArgumentParser(
-#     description="Ingest a batch of experiments")
-# parser.add_argument('--uuid', required=True,
-#                     help="UUID for batch")
-# parser.add_argument('--issue', required=True,
-#                    help="Github issue is in internal")
-# args = parser.parse_args()
-# #--------------------------------------------------------------------------------
-
-
 
 #Checking if the uuid is correct
 #--------------------------------------------------------------------------------
@@ -265,13 +250,6 @@ elif args_uuid[11] == 'e':
 
             print("---------------------get samples.keys()", get_samples.keys())
 
-
-#            experiment_metadata["channels"] = (get_samples["amplifier_channels"])
-
-           # for i in range(32):
-
-            #    experiment_metadata["channels"].append([])
-
             if len(rhss)>0:
 
                 experiment_metadata["num_channels"] = int(data['amplifier_data'].shape[0])*2
@@ -297,7 +275,7 @@ elif args_uuid[11] == 'e':
 
                 print("------------------this is the shape of actual data", data['amplifier_data'].shape)
 
-                #experiment_metadata['num_channels'] = int(data['stim_data].shape[0])+ int(data['amplifier_data].shape[0])
+
 
 
 
@@ -309,7 +287,6 @@ elif args_uuid[11] == 'e':
 
                 stim_data_reformatted = (data['stim_data']/(.195)) 
 
-                #put_this_in_binary = np.concatenate((subtracted_data, stim_data_reformatted), axis = 0)
 
                 i=0
                 put_this_in_binary =[]
@@ -358,103 +335,7 @@ elif args_uuid[11] == 'e':
 
         json.dump(batch_metadata, f, sort_keys=True)
     #------------------------------------------------------------------------------------------
-    
-#Nico's spike sorting!!!!!!
-# # ------------------------------------------------------------------------
 
-#     print('Importing spikeinterface. It will take a little bit.')
-#     import spikeinterface
-#     import spikeinterface.extractors as se 
-#     import spikeinterface.toolkit as st
-#     import spikeinterface.sorters as sorters
-#     import spikeinterface.comparison as sc
-#     import spikeinterface.widgets as sw
-#     import matplotlib.pylab as plt
-    
-#     #the directory for all the stuff we don't need but is made anyways
-#     path_for_spike_stuff = str('/public/groups/braingeneers/ephys/'+args_uuid+'/other_spike_stuff')
-
-#     if not os.path.exists(path_for_spike_stuff):
-#         os.mkdir(path_for_spike_stuff)
-        
-#     path_for_actual_spikes = str('/public/groups/braingeneers/ephys/'+args_uuid+'/nico_spikes')
-
-#     if not os.path.exists(path_for_actual_spikes):
-#         os.mkdir(path_for_actual_spikes)
-    
-#     for i in range(len(batch_metadata['experiments'])):
-        
-#         print('check')
-#         print(args_uuid, i)
-#         test_blocks = grab_files_from_derived.load_blocks(args_uuid, i)
-        
-#         blocks = np.transpose(grab_files_from_derived.load_blocks(args_uuid, i)[0])
-        
-#         print('[[[[[[[[[[[[[[[[[[[[[[[   ' + str(blocks.shape))
-
-#         geom = genfromtxt('256ANS_locs.csv', delimiter=',')
-
-#         geom = geom[1:129]
-
-#         print('Geom Shape:  ' +str(geom.shape))
-
-#         fs =experiment_metadata["sample_rate"]
-
-#         recording=se.NumpyRecordingExtractor(
-#             timeseries=blocks,
-#             geom=geom,
-#             sampling_frequency=fs
-#         )
-        
-#         channel_ids = recording.get_channel_ids()
-
-#         fs = recording.get_sampling_frequency()
-
-#         num_chan = recording.get_num_channels()
-
-#         recording_f = st.preprocessing.bandpass_filter(recording, freq_min=300, freq_max=6000)
-#         #recording_rm_noise = st.preprocessing.remove_bad_channels(recording_f, bad_channel_ids=[5])
-#         recording_cmr = st.preprocessing.common_reference(recording_f, reference='median')
-
-#         sorting_MS4 = sorting_MS4 = sorters.run_mountainsort4(recording_f, num_workers=15,
-#                                         freq_min=None, freq_max=None, filter=True,
-#                                         detect_threshold=5, detect_interval= 20,
-#                                        adjacency_radius=None)
-
-#         try:
-#             st.postprocessing.export_to_phy(recording_f, sorting_MS4, output_folder=path_for_spike_stuff)
-#         except (TypeError, ValueError):
-#             print('This is normal')
-        
-# #         #Convert firings.mda to npy and move to the right place
-#         #----------------------------------------------------------------------------------------  
-#         import spikeextractors.extractors.mdaextractors.mdaio
-
-#         path_of_firings = 'tmp_mountainsort4/firings.mda'
-
-#         if os.path.isfile(path_of_firings):
-#             spikes = spikeextractors.extractors.mdaextractors.mdaio.readmda(path_of_firings)
-#         else:
-#             raise Exception('The path does not exist for the spikes')
-        
-#     #    where_the_spike_is = '/public/groups/braingeneers/ephys/'+args_uuid+'/other_spike_stuff/spike_times.npy'
-        
-
-#         path_to_save_spike = '/public/groups/braingeneers/ephys/' + args_uuid + '/nico_spikes/' \
-#         + batch_metadata["experiments"][i][:-5].rsplit('/',1)[-1] + '_spikes.npy'
-        
-#         print('Saving', path_to_save_spike)
-        
-#         np.save(path_to_save_spike, spikes)
-        
-#         #shutil.move(where_the_spike_is, path_to_save_spike)
-#         #----------------------------------------------------------------------------------------  
-        
-    #the directory that contains all the files that we do not need is deleted.
-#     shutil.rmtree(path_for_spike_stuff)
-    
-#     #the directory is not useful now that we have the spikes
-#     shutil.rmtree('tmp_mountainsort4')
     
     print('Finished Ingesting Batch')
     
