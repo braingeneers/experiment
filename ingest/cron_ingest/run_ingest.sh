@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # pulls the jobs for analysis that will be run after ingest
-
+#-----------------------------------------------------------
 source pull_git_jobs.sh
 
 python3 create_current_files_in_dir.py
