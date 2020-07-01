@@ -3,17 +3,17 @@
 
 source pull_git_jobs.sh
 
-# python3 create_current_files_in_dir.py
+python3 create_current_files_in_dir.py
 
-# declare -a current_files_in_dir
+declare -a current_files_in_dir
 
-# current_files_in_dir=()
-# while IFS= read -r line || [[ "$line" ]]; do
-#   current_files_in_dir+=("$line")
-# done < 'files_in_dir.txt'
+current_files_in_dir=()
+while IFS= read -r line || [[ "$line" ]]; do
+  current_files_in_dir+=("$line")
+done < 'files_in_dir.txt'
 
 
-#echo ${current_files_in_dir[*]}
+echo ${current_files_in_dir[*]}
 
 A=${current_files_in_dir[@]};
 
