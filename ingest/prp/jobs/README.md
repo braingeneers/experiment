@@ -39,7 +39,7 @@ In order to test your Kubernetes container, set
 <pre><code>
 command: ["/bin/bash", "-c" ]
 args:
- - sleep 1d
+ - sleep 3h
 </code></pre>
 
 Use one of the test UUID cases with:
