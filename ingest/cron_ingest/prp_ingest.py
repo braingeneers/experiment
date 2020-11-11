@@ -1,4 +1,4 @@
-import os 
+import os
 import glob
 import argparse
 import re
@@ -22,7 +22,7 @@ args_issue = '0'
 #--------------------------------------------------------------------------------
 if len(args_uuid) < 11:
     raise Exception('The uuid is too short. Make sure you are using the right format.')
-     
+
 if args_uuid[11] == 'i' or args_uuid[11] == 'e'or args_uuid[11] == 'f':
     print('The formatting for group specification is correct.')
 else:
@@ -30,7 +30,7 @@ else:
                     the identification of the experiment is not in the 12th character place on the uuid.')
 #--------------------------------------------------------------------------------
 
-#Check for Imaging 
+#Check for Imaging
 #--------------------------------------------------------------------------------
 if args_uuid[11] == 'i':
     print('The ingest for imaging is starting.')
@@ -38,8 +38,8 @@ if args_uuid[11] == 'i':
         raise FileExistsError('Some body has already ingested this batch. \n If you want to ingest it again you will have to run: \
                               rm -r /public/groups/braingeneers/Imaging/'+args_uuid+'/derived/  to delete the past ingest. \
                               \n BE CAREFUL!!!!!!!!')
-        
-        
+
+
     shutil.copytree('/public/groups/braingeneers/Imaging/' + args_uuid + '/original/' , 'Imaging/' + args_uuid + 'derived/')
     print('The images in original have been copied to derived')
 #--------------------------------------------------------------------------------
@@ -47,31 +47,31 @@ if args_uuid[11] == 'i':
 #Check for Fluidics
 #--------------------------------------------------------------------------------
 elif args_uuid[11] == 'f':
-    print('There is no ingest for fluidics data. It is already ready to read.') 
+    print('There is no ingest for fluidics data. It is already ready to read.')
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
 elif args_uuid[11] == 'e':
-    
-   
+
+
     print('The ingest for electrophysiology is starting.')
     print("/public/groups/braingeneers/ephys/{}/original/*.rhs".format(args_uuid))
     if len(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhs".format(args_uuid)))==0 \
     and len(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhd".format(args_uuid))) ==0:
         print("There are no rhd or rhs files. Must not be from UCSC")\
-        
+
     elif len(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhs".format(args_uuid)))>0 \
     or len(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhd".format(args_uuid))) >0:
-        
+
         print("There are rhs or rhd files")
-        
+
     #Converts datetime to ntp
     #----------------------------------------------------------------------------------------
     def datetime_to_ntp(ts):
         diff = ts - datetime.datetime(1900, 1, 1, 0, 0, 0)
         return np.uint64((int(diff.total_seconds()) << 32) + (diff.microseconds / 1000000 * 2**32))
     #---------------------------------------------------------------------------------------------------
-    
+
     if os.path.isdir("/public/groups/braingeneers/ephys/{}/derived/".format(args_uuid)):
             raise FileExistsError('Some body has already ingested this batch. \n If you want to ingest it again \
                                   you will have to run: \
@@ -87,7 +87,7 @@ elif args_uuid[11] == 'e':
     "notes": open("/public/groups/braingeneers/ephys/{}/original/batch.txt".format(args_uuid)).read() \
         if os.path.exists("/public/groups/braingeneers/ephys/{}/original/batch.txt".format(args_uuid)) else "",
     "email": open("/public/groups/braingeneers/ephys/{}/original/email.txt".format(args_uuid)).read() if os.path.exists("/public/groups/braingeneers/ephys/{}/original/email.txt".format(args_uuid)) else ""}
-    
+
     experiments = []
 
     rhss = sorted(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhs".format(args_uuid, exist_ok=True)))
@@ -112,7 +112,7 @@ elif args_uuid[11] == 'e':
         experiment_names = experiment_names_rhs
 
     #----------------------------------------------------------------------------------------
-    
+
     #Setting Experiment Metadata
     #--------------------------------------------------------------------------------------------
     for experiment_name in experiment_names:
@@ -124,7 +124,7 @@ elif args_uuid[11] == 'e':
 
         print('--------------experiment_name:  '+experiment_name)
 
-        experiment_metadata["offset"] = 0               
+        experiment_metadata["offset"] = 0
 
         experiment_metadata["units"] = "\u00b5V"
 
@@ -132,12 +132,12 @@ elif args_uuid[11] == 'e':
 
         experiment_metadata["version"]="0.0.1"
 
-        experiment_metadata["blocks"]=[]         
+        experiment_metadata["blocks"]=[]
     #---------------------------------------------------------
-    
+
     # Add <experiment_name>.txt to the notes field
     #---------------------------------------------------------
-    
+
         print('Path for notes :', "/public/groups/braingeneers/ephys/{}/original/{}.txt".format(args_uuid, experiment_name))
         if os.path.exists("/public/groups/braingeneers/ephys/{}/original/{}.txt".format(args_uuid, experiment_name)):
             experiment_metadata["notes"] = open(
@@ -145,14 +145,14 @@ elif args_uuid[11] == 'e':
         else:
             experiment_metadata["notes"] = ""
     #-----------------------------------------------------------------------------
-    
+
     # Find all the rhd's and rhs's that match the experiment name and walk through in sorted/time order
     #------------------------------------------------------------------------------------------------
         experiment_metadata["channels"] = []
         print("/public/groups/braingeneers/ephys/{}/original/*.rhd".format(args_uuid, exist_ok=True))
         for p in sorted(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhd".format(args_uuid))):
             print('This is p', p)
-            
+
         rhds = [p for p in sorted(glob.glob("/public/groups/braingeneers/ephys/{}/original/*.rhd".format(args_uuid, exist_ok=True)))
                 if re.findall(r"(.*?)\/(.*?)\/(.*?)_(\d{6}_\d{6}).rhd", p)[0][2].split('/')[-1] == experiment_name]
         print("Original rhd files to ingest:", rhds)
@@ -174,13 +174,13 @@ elif args_uuid[11] == 'e':
         experiment_metadata["timestamp"] = datetime.datetime.strptime(
                 re.findall(r"_(\d{6}_\d{6})", timestamp_for_experiment_metadata)[0], "%y%m%d_%H%M%S").isoformat()
     #-------------------------------------------------------------------------------------------
-    
-    # Try reading its rhs or rhd files 
+
+    # Try reading its rhs or rhd files
     #-------------------------------------------------------------------------------------------
         if len(rhss) > 0:
             files_to_ingest = rhss
         elif len(rhds)> 0:
-            files_to_ingest = rhds       
+            files_to_ingest = rhds
 
 
         for sample_path in files_to_ingest:
@@ -200,7 +200,7 @@ elif args_uuid[11] == 'e':
            # for i in data['stim_parameters']:
             #    print(i, data['stim_parameters'][i])
 
-            get_samples={} 
+            get_samples={}
 
             get_samples.update({k: v for k, v in data.items() if sys.getsizeof(v) < 2048})
 
@@ -209,11 +209,15 @@ elif args_uuid[11] == 'e':
 
             experiment_metadata["sample_rate"]= int(get_samples["frequency_parameters"]["amplifier_sample_rate"])
 
+            if len(rhss) > 0:
+                experiment_metadata["hardware"] = "Intan RHS 2000 Controller"
+            else:
+                fexperiment_metadata["hardware"] = "Intan RHD 2000 Controller"
 
     #-------------------------------------------------------------------------------------------
-    
+
     #Setting metadata
-    #-------------------------------------------------------------------------------------------           
+    #-------------------------------------------------------------------------------------------
             sample_metadata = {}
 
             print("This is the sample path", sample_path)
@@ -235,8 +239,8 @@ elif args_uuid[11] == 'e':
 
             experiment_metadata['blocks'].append({'timestamp': str(block_timestamp.isoformat()),
                                                   'path': '{}bin'.format(str(sample_path).split("/")[-1][:-3]),
-                                                  'source': sample_path, 
-                                                  'num_frames':data["amplifier_data"].shape[1]}) 
+                                                  'source': sample_path,
+                                                  'num_frames':data["amplifier_data"].shape[1]})
 
             if "timestamp" not in batch_metadata:
 
@@ -267,6 +271,8 @@ elif args_uuid[11] == 'e':
             "timestamp": experiment_metadata["timestamp"]
     })
 
+
+
             experiment_metadata['num_voltage_channels'] = int(data['amplifier_data'].shape[0])
 
             if len(rhss) > 0:
@@ -285,7 +291,7 @@ elif args_uuid[11] == 'e':
 
                 print("Second frame:", subtracted_data[:,1]*.195)
 
-                stim_data_reformatted = (data['stim_data']/(.195)) 
+                stim_data_reformatted = (data['stim_data']/(.195))
 
 
                 i=0
@@ -305,7 +311,7 @@ elif args_uuid[11] == 'e':
 
                 put_this_in_binary = data['amplifier_data']
 
-                put_this_in_binary = put_this_in_binary.astype(np.int32)-32768      
+                put_this_in_binary = put_this_in_binary.astype(np.int32)-32768
 
             with open("/public/groups/braingeneers/ephys/{}/derived/{}.bin".format(args_uuid, sample_metadata["name"]), "wb") as f:
                 print("Writing the timestamp in the bin file")
@@ -314,10 +320,10 @@ elif args_uuid[11] == 'e':
 
                 print("Writing the numpy array in the bin file")
 
-                put_this_in_binary.astype('int16').tofile(f)   
+                put_this_in_binary.astype('int16').tofile(f)
 
     #-------------------------------------------------------------------------------------------
-    
+
     #Save the meta data for this experiment
     #-------------------------------------------------------------------------------------------
 
@@ -336,8 +342,5 @@ elif args_uuid[11] == 'e':
         json.dump(batch_metadata, f, sort_keys=True)
     #------------------------------------------------------------------------------------------
 
-    
-    print('Finished Ingesting Batch')
-    
-    
 
+    print('Finished Ingesting Batch')
